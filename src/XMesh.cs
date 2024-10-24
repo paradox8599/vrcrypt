@@ -32,7 +32,7 @@ public class XMesh
     public Vector2[] uv8;
 
     // Blend shapes
-    public BlendShapeData[] blendShapes;
+    public XBlendShape[] blendShapes;
 
     [DebuggerHidden]
     public XMesh(Mesh mesh)
@@ -68,10 +68,10 @@ public class XMesh
         }
 
         // Blend shapes
-        List<BlendShapeData> blendShapes = new List<BlendShapeData>();
+        List<XBlendShape> blendShapes = new List<XBlendShape>();
         for (int i = 0; i < mesh.blendShapeCount; i++)
         {
-            BlendShapeData blendShape = new BlendShapeData(mesh, i);
+            XBlendShape blendShape = new XBlendShape(mesh, i);
             mesh.GetBlendShapeFrameVertices(
                 i,
                 blendShape.frameCount - 1,

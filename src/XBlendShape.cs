@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 [System.Serializable]
-public class BlendShapeData
+public class XBlendShape
 {
     public string name;
     public Vector3[] deltaVertices;
@@ -10,7 +10,7 @@ public class BlendShapeData
     public float frameWeight;
     public int frameCount;
 
-    public BlendShapeData(Mesh mesh, int i)
+    public XBlendShape(Mesh mesh, int i)
     {
         this.name = mesh.GetBlendShapeName(i);
         this.frameCount = mesh.GetBlendShapeFrameCount(i);

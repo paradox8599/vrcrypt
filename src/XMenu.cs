@@ -6,7 +6,7 @@ using Debug = UnityEngine.Debug;
 
 public class XMenu : EditorWindow
 {
-    private static Dictionary<string, global::XMesh>? meshes = null;
+    private static Dictionary<string, XMesh>? meshes = null;
 
     private string code = "";
     private GameObject? avatar = null;
@@ -21,7 +21,7 @@ public class XMenu : EditorWindow
             if (smr != null)
             {
                 Debug.Log($"Adding: {path}, {smr.name}");
-                var mesh = global::XMesh.FromMesh(smr.sharedMesh);
+                var mesh = XMesh.FromMesh(smr.sharedMesh);
                 mesh.path = path;
                 meshes?.Add(mesh.ToHash(), mesh);
             }
@@ -62,7 +62,7 @@ public class XMenu : EditorWindow
         if (GUILayout.Button("Read") && IsSelectedAvatarPrefab())
         {
             Debug.Log("Clearing Previous meshes");
-            meshes = new Dictionary<string, global::XMesh>();
+            meshes = new Dictionary<string, XMesh>();
             ReadRecursive(GameObject.Find("Mamehinata_PC"));
         }
 
