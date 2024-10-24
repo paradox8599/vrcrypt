@@ -30,11 +30,11 @@ public class XMenu : EditorWindow
     }
 
     [DebuggerHidden]
-    [MenuItem("Para/Show")]
+    [MenuItem("VRCrypt/Show")]
     private static void ShowMenu()
     {
         var w = EditorWindow.GetWindow(typeof(XMenu));
-        w.titleContent = new GUIContent("Para");
+        w.titleContent = new GUIContent("VRCrypt");
     }
 
     // On GUI
