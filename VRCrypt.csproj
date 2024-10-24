@@ -3,22 +3,23 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <Nullable>enable</Nullable>
-	<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\mate\VRC.SDK3A.csproj" />
-    <ProjectReference Include="..\mate\VRC.SDKBase.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Reference Include="UnityEditor">
-      <HintPath>..\..\Editors\Unity 2022.3.22f1\Editor\Data\Managed\UnityEditor.dll</HintPath>
+      <HintPath>refs/UnityEditor.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
-      <HintPath>..\..\Editors\Unity 2022.3.22f1\Editor\Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath>refs\UnityEngine.dll</HintPath>
     </Reference>
+    <Reference Include="VRCSDK3A">
+      <HintPath>refs/VRCSDK3A.dll</HintPath>
+     </Reference>
+    <Reference Include="VRCSDKBase">
+      <HintPath>refs/VRCSDKBase.dll</HintPath>
+     </Reference>
   </ItemGroup>
 
 
