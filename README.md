@@ -8,6 +8,7 @@
 - `ln -s <Unity Editor>\Data\Managed\UnityEngine.dll refs\UnityEngine.dll`
 - `ln -s <Project>\Packages\com.vrchat.avatars\Runtime\VRCSDK\Plugins\VRCSDK3A.dll refs\VRCSDK3A.dll`
 - `ln -s <Project>\Packages\com.vrchat.base\Runtime\VRCSDK\Plugins\VRCSDKBase.dll refs\VRCSDKBase.dll`
+- `ln -s <Project>\Assets\RustNative\vrcrypt_lib\vrcrypt_lib.cs refs\vrcrypt_lib.cs`
 
 ### Link Output Directory
 

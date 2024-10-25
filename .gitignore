@@ -1,4 +1,5 @@
 bin/
 obj/
-refs/*.dll
 out
+refs/*.dll
+refs/*.cs
