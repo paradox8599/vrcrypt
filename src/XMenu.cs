@@ -6,8 +6,6 @@ using Debug = UnityEngine.Debug;
 
 public class XMenu : EditorWindow
 {
-    public static string savePath = "Assets/VRCrypt/data";
-
     private Dictionary<string, XMesh>? meshes = null;
     private GameObject? avatar = null;
     private Vector2 scrollPosition = Vector2.zero;
