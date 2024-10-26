@@ -29,6 +29,12 @@ public class XMenu : EditorWindow
 
         GUILayout.Label("Avatar", EditorStyles.boldLabel);
 
+        if (GUILayout.Button("FFI"))
+        {
+            var str = FFI.read("hello");
+            Debug.Log(str);
+        }
+
         // code = EditorGUILayout.TextField("Code", code);
         avatar =
             EditorGUILayout.ObjectField(
