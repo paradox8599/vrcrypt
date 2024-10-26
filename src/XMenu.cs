@@ -6,28 +6,9 @@ using Debug = UnityEngine.Debug;
 
 public class XMenu : EditorWindow
 {
-    private static Dictionary<string, XMesh>? meshes = null;
-
-    private string code = "";
+    private Dictionary<string, XMesh>? meshes = null;
     private GameObject? avatar = null;
-
-    private static void ReadRecursive(GameObject root, string prefix = "")
-    {
-        foreach (Transform child in root.transform)
-        {
-            var childGo = child.gameObject;
-            childGo.TryGetComponent<SkinnedMeshRenderer>(out SkinnedMeshRenderer? smr);
-            var path = $"{prefix}/{childGo.name}";
-            if (smr != null)
-            {
-                Debug.Log($"Adding: {path}, {smr.name}");
-                var mesh = XMesh.FromMesh(smr.sharedMesh);
-                mesh.path = path;
-                meshes?.Add(mesh.ToHash(), mesh);
-            }
-            ReadRecursive(childGo, path);
-        }
-    }
+    private Vector2 scrollPosition = Vector2.zero;
 
     [DebuggerHidden]
     [MenuItem("VRCrypt/Show")]
@@ -43,12 +24,17 @@ public class XMenu : EditorWindow
     {
         GUILayout.Label("Activate", EditorStyles.boldLabel);
 
-        code = EditorGUILayout.TextField("Code", code);
+        // code = EditorGUILayout.TextField("Code", code);
         avatar =
             EditorGUILayout.ObjectField("Avatar Prefab", avatar, typeof(GameObject), true)
             as GameObject;
+        if (avatar == null)
+        {
+            return;
+        }
 
-        if (avatar != null && !IsSelectedAvatarPrefab())
+        XGameObject xAvatar = new XGameObject(avatar);
+        if (!xAvatar.isPrefab)
         {
             EditorGUILayout.HelpBox(
                 "Please select an avatar prefab from Assets.",
@@ -58,30 +44,49 @@ public class XMenu : EditorWindow
 
         // Read
 
-        GUI.enabled = IsSelectedAvatarPrefab();
-        if (GUILayout.Button("Read") && IsSelectedAvatarPrefab())
+        GUI.enabled = xAvatar.isPrefab;
+        if (GUILayout.Button("Read") && GUI.enabled)
         {
-            Debug.Log("Clearing Previous meshes");
             meshes = new Dictionary<string, XMesh>();
-            ReadRecursive(GameObject.Find("Mamehinata_PC"));
-        }
-
-        // List Serializable Meshes and their paths
-
-        GUI.enabled = meshes != null;
-        if (GUILayout.Button("List Meshes") && meshes != null)
-        {
-            Debug.Log("Listing Meshes");
-            foreach (var (hash, mesh) in meshes)
+            foreach (var xMesh in xAvatar.meshes)
             {
-                Debug.Log($"{hash}: {mesh.path}");
+                var hash = xMesh.ToHash();
+                meshes.Add(hash, xMesh);
+                Debug.Log($"Read mesh: {hash}, {xMesh.path}");
             }
         }
-        GUI.enabled = true;
-    }
 
-    bool IsSelectedAvatarPrefab()
-    {
-        return avatar != null && PrefabUtility.IsPartOfPrefabAsset(avatar);
+        // Write
+
+        GUI.enabled = meshes != null;
+        if (GUILayout.Button("Write Meshes") && meshes != null)
+        {
+            // string prefabPath = AssetDatabase.GetAssetPath(avatar);
+            // Debug.Log($"Prefab path: {prefabPath}");
+            // GameObject prefabRoot = PrefabUtility.LoadPrefabContents(prefabPath);
+
+            // ...
+
+            // PrefabUtility.SaveAsPrefabAsset(prefabRoot, prefabPath);
+            // PrefabUtility.UnloadPrefabContents(prefabRoot);
+            // AssetDatabase.SaveAssets();
+            // AssetDatabase.Refresh();
+        }
+
+        GUI.enabled = true;
+
+        scrollPosition = GUILayout.BeginScrollView(scrollPosition);
+        GUILayout.BeginVertical();
+
+        if (meshes != null)
+        {
+            foreach (var (hash, xMesh) in meshes)
+            {
+                GUILayout.Label($"{hash}: {xMesh.path}");
+            }
+        }
+
+        GUILayout.EndVertical();
+        GUILayout.EndScrollView();
     }
 }

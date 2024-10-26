@@ -22,14 +22,7 @@ public class XMesh
     public SubMeshDescriptor[] subMeshes;
 
     // UV channels
-    public Vector2[] uv;
-    public Vector2[] uv2;
-    public Vector2[] uv3;
-    public Vector2[] uv4;
-    public Vector2[] uv5;
-    public Vector2[] uv6;
-    public Vector2[] uv7;
-    public Vector2[] uv8;
+    public List<List<Vector2>> uvs = new List<List<Vector2>>();
 
     // Blend shapes
     public XBlendShape[] blendShapes;
@@ -51,14 +44,12 @@ public class XMesh
         boundsExtents = mesh.bounds.extents;
 
         // UV channels
-        uv = mesh.uv;
-        uv2 = mesh.uv2;
-        uv3 = mesh.uv3;
-        uv4 = mesh.uv4;
-        uv5 = mesh.uv5;
-        uv6 = mesh.uv6;
-        uv7 = mesh.uv7;
-        uv8 = mesh.uv8;
+        for (int i = 0; i < 8; i++)
+        {
+            var o = new List<Vector2>();
+            mesh.GetUVs(i, o);
+            uvs.Add(o);
+        }
 
         // Submeshes
         subMeshes = new SubMeshDescriptor[mesh.subMeshCount];
@@ -85,7 +76,7 @@ public class XMesh
     }
 
     [DebuggerHidden]
-    public static XMesh FromMesh(Mesh mesh)
+    public static XMesh New(Mesh mesh)
     {
         return new XMesh(mesh);
     }
@@ -115,14 +106,14 @@ public class XMesh
             bounds = new Bounds(this.boundsCenter, this.boundsExtents * 2),
 
             // UV channels
-            uv = this.uv,
-            uv2 = this.uv2,
-            uv3 = this.uv3,
-            uv4 = this.uv4,
-            uv5 = this.uv5,
-            uv6 = this.uv6,
-            uv7 = this.uv7,
-            uv8 = this.uv8,
+            uv = this.uvs[0].ToArray(),
+            uv2 = this.uvs[1].ToArray(),
+            uv3 = this.uvs[2].ToArray(),
+            uv4 = this.uvs[3].ToArray(),
+            uv5 = this.uvs[4].ToArray(),
+            uv6 = this.uvs[5].ToArray(),
+            uv7 = this.uvs[6].ToArray(),
+            uv8 = this.uvs[7].ToArray(),
 
             // Submeshes
             subMeshCount = this.subMeshes.Length,
@@ -146,24 +137,14 @@ public class XMesh
             );
         }
 
-        mesh.RecalculateBounds();
-        mesh.RecalculateNormals();
-        mesh.RecalculateTangents();
-
         return mesh;
     }
 
     [DebuggerHidden]
-    public string ToJson()
-    {
-        return JsonUtility.ToJson(this);
-    }
+    public string ToJson() => JsonUtility.ToJson(this);
 
     [DebuggerHidden]
-    public byte[] ToBytes()
-    {
-        return Encoding.UTF8.GetBytes(ToJson());
-    }
+    public byte[] ToBytes() => Encoding.UTF8.GetBytes(ToJson());
 
     [DebuggerHidden]
     public byte[] ToHashBytes()
