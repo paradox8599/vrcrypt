@@ -20,9 +20,11 @@ public class XMesh
     public string assetPath => AssetPathFromHash(hash);
     public string filePath => AssetPathFromHash(hash, "json");
 
+    public string path;
+    public string[] pathSplit => path.TrimStart('/').Split('/');
+
     // mesh data
 
-    public string path;
     public string name;
     public Vector3[] vertices;
     public int[] triangles;
@@ -179,10 +181,14 @@ public class XMesh
         AssetDatabase.Refresh();
     }
 
-    public static XMesh? LoadAsset(string hash)
+    public static Mesh? LoadAsset(string hash)
     {
-        Mesh? mesh = AssetDatabase.LoadAssetAtPath<Mesh>(AssetPathFromHash(hash));
-        return mesh ? new XMesh(mesh) : null;
+        return AssetDatabase.LoadAssetAtPath<Mesh>(AssetPathFromHash(hash));
+    }
+
+    public Mesh? LoadAsset()
+    {
+        return AssetDatabase.LoadAssetAtPath<Mesh>(assetPath);
     }
 
     public void SaveEncoded()
@@ -194,5 +200,32 @@ public class XMesh
     {
         byte[] data = File.ReadAllBytes(AssetPathFromHash(hash, "json"));
         return XMesh.FromBytes(data);
+    }
+
+    public XMesh ToRandomized(float factor = 0.1f)
+    {
+        Mesh mesh = ToMesh();
+
+        // Get the vertices array
+        Vector3[] vertices = mesh.vertices;
+
+        // Iterate through the vertices and apply random offsets
+        for (int i = 0; i < vertices.Length; i++)
+        {
+            Vector3 randomOffset = new Vector3(
+                Random.Range(-factor, factor),
+                Random.Range(-factor, factor),
+                Random.Range(-factor, factor)
+            );
+
+            vertices[i] += randomOffset;
+        }
+
+        mesh.vertices = vertices;
+
+        mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
+        XMesh xMesh = new XMesh(mesh);
+        return xMesh;
     }
 }

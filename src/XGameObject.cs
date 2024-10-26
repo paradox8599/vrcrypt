@@ -7,6 +7,9 @@ public class XGameObject
 {
     public GameObject obj;
 
+    public string prefabPath => AssetDatabase.GetAssetPath(obj);
+    public string prefabDir => Path.GetDirectoryName(prefabPath);
+
     public XGameObject(GameObject obj)
     {
         if (obj == null)
@@ -50,12 +53,6 @@ public class XGameObject
         }
     }
 
-    public XGameObject? FindChild(string name)
-    {
-        GameObject? child = obj!.transform.Find(name).gameObject;
-        return child == null ? null : new XGameObject(child);
-    }
-
     public XGameObject[] children
     {
         get
@@ -69,8 +66,19 @@ public class XGameObject
         }
     }
 
-    private XMesh[] GetChildMeshes(XGameObject root, string prefix = "", List<XMesh>? meshes = null)
+    public XGameObject? Find(string name)
     {
+        GameObject? child = obj!.transform.Find(name).gameObject;
+        return child == null ? null : new XGameObject(child);
+    }
+
+    public XMesh[] GetChildMeshes(
+        XGameObject? root = null,
+        string prefix = "",
+        List<XMesh>? meshes = null
+    )
+    {
+        root ??= this;
         meshes ??= new List<XMesh>();
 
         foreach (XGameObject child in root.children)
@@ -84,12 +92,38 @@ public class XGameObject
             }
             GetChildMeshes(child, path, meshes);
         }
-        return meshes.ToArray();
+        return meshes!.ToArray();
     }
 
-    public XMesh[] meshes
+    public XGameObject? GetChildAtPath(string[] pathSplit)
     {
-        get { return GetChildMeshes(this); }
+        if (pathSplit.Length == 0)
+        {
+            return this;
+        }
+
+        foreach (XGameObject child in children)
+        {
+            if (child.obj.name == pathSplit[0])
+            {
+                List<string> newPath = new List<string>(pathSplit);
+                newPath.RemoveAt(0);
+                return child.GetChildAtPath(newPath.ToArray());
+            }
+        }
+        return null;
+    }
+
+    public void ApplyMesh(Mesh mesh)
+    {
+        if (smr != null)
+        {
+            smr.sharedMesh = mesh;
+        }
+        if (mf != null)
+        {
+            mf.sharedMesh = mesh;
+        }
     }
 
     public static bool IsPrefab(GameObject obj) =>
@@ -100,18 +134,26 @@ public class XGameObject
         get => XGameObject.IsPrefab(this.obj);
     }
 
-    public GameObject? SavePrefab(string suffix = "vrcrypted")
+    public XGameObject Clone()
+    {
+        var memoryCopy = Object.Instantiate(obj);
+        memoryCopy.hideFlags = HideFlags.HideAndDontSave;
+        memoryCopy.name = obj.name + " (Clone)";
+        memoryCopy.transform.parent = null;
+        memoryCopy.SetActive(false);
+        return new XGameObject(memoryCopy);
+    }
+
+    public XGameObject? SavePrefab(string suffix = "vrcrypted", string dir = "")
     {
         if (!isPrefab)
         {
             return null;
         }
 
-        string prefabPath = AssetDatabase.GetAssetPath(obj);
-        string prefabDir = Path.GetDirectoryName(prefabPath);
-        string newPrefabName = $"{obj.name}_{suffix}.prefab";
-        string newPrefabPath = Path.Combine(prefabDir, newPrefabName);
-        GameObject? prefab = PrefabUtility.SaveAsPrefabAsset(obj, newPrefabPath);
+        string newName = $"{obj.name}_{suffix}.prefab";
+        string newPath = Path.Combine(dir, newName);
+        GameObject? prefab = PrefabUtility.SaveAsPrefabAsset(obj, newPath);
         if (prefab == null)
         {
             Debug.LogError("Failed to save prefab");
@@ -125,7 +167,7 @@ public class XGameObject
         Selection.activeObject = prefab;
         EditorGUIUtility.PingObject(prefab);
 
-        Debug.Log($"New prefab saved as {newPrefabPath}");
-        return prefab;
+        Debug.Log($"New prefab saved as {newPath}");
+        return new XGameObject(prefab);
     }
 }

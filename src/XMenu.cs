@@ -9,6 +9,7 @@ public class XMenu : EditorWindow
     private Dictionary<string, XMesh>? meshes = null;
     private GameObject? avatar = null;
     private Vector2 scrollPosition = Vector2.zero;
+    private float factor = 0.01f;
 
     [DebuggerHidden]
     [MenuItem("VRCrypt/Show")]
@@ -22,7 +23,11 @@ public class XMenu : EditorWindow
 
     void OnGUI()
     {
-        GUILayout.Label("Activate", EditorStyles.boldLabel);
+        GUILayout.Label("VRCrypt", EditorStyles.boldLabel);
+
+        factor = GUILayout.HorizontalSlider(factor * 100, 0, 1) * 0.01f;
+
+        GUILayout.Label("Avatar", EditorStyles.boldLabel);
 
         // code = EditorGUILayout.TextField("Code", code);
         avatar =
@@ -32,6 +37,7 @@ public class XMenu : EditorWindow
                 typeof(GameObject),
                 true
             ) as GameObject;
+
         if (avatar == null)
         {
             return;
@@ -48,40 +54,44 @@ public class XMenu : EditorWindow
 
         // Read
 
+
         GUI.enabled = xAvatar.isPrefab;
-        if (GUILayout.Button("Read") && xAvatar.isPrefab)
+        if (GUILayout.Button("Read Meshes") && xAvatar.isPrefab)
         {
             meshes = new Dictionary<string, XMesh>();
-            foreach (var xMesh in xAvatar.meshes)
+            foreach (var xMesh in xAvatar.GetChildMeshes())
             {
-                var hash = xMesh.ToHash();
-                meshes.Add(hash, xMesh);
-                Debug.Log($"Read mesh: {hash}, {xMesh.path}");
+                var x = xMesh.ToRandomized(factor);
+                var hash = x.ToHash();
+                x.path = xMesh.path;
+                x.SaveAsset();
+                meshes.Add(hash, x);
+                Debug.Log($"Read mesh: {hash}, {x.path}");
             }
         }
 
         GUI.enabled = meshes != null;
 
-        // Save
+        // Write
 
-        if (GUILayout.Button("Save Meshes") && meshes != null)
+        if (GUILayout.Button("Write") && meshes != null)
         {
-            foreach (var xMesh in meshes.Values)
+            var a = xAvatar.SavePrefab("vrcrypted", xAvatar.prefabDir)!;
+            foreach (var (hash, xMesh) in meshes!)
             {
-                xMesh.SaveAsset();
-                xMesh.SaveEncoded();
+                Debug.Log($"{hash}, {xMesh.path}");
+                var m = xMesh.LoadAsset()!;
+                Debug.Log($"Getting child: {xMesh.path}");
+                var go = a.GetChildAtPath(xMesh.pathSplit)!;
+                Debug.Log($"Child got: {go.obj.name}");
+                go.ApplyMesh(m);
+                Debug.Log($"Applied mesh: {hash}");
             }
         }
 
-        // Write
-
-        if (GUILayout.Button("Save Prefab") && meshes != null)
-        {
-            // var date = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
-            xAvatar.SavePrefab();
-        }
-
         GUI.enabled = true;
+
+        // List
 
         scrollPosition = GUILayout.BeginScrollView(scrollPosition);
         GUILayout.BeginVertical();
