@@ -100,13 +100,32 @@ public class XGameObject
         get => XGameObject.IsPrefab(this.obj);
     }
 
-    public void SavePrefab(string alt = "vrcrypted")
+    public GameObject? SavePrefab(string suffix = "vrcrypted")
     {
-        string path = AssetDatabase.GetAssetPath(obj);
-        path = Path.GetDirectoryName(path);
-        path = Path.Combine(path, $"{obj.name}_{alt}.prefab");
-        PrefabUtility.SaveAsPrefabAsset(obj, path);
+        if (!isPrefab)
+        {
+            return null;
+        }
+
+        string prefabPath = AssetDatabase.GetAssetPath(obj);
+        string prefabDir = Path.GetDirectoryName(prefabPath);
+        string newPrefabName = $"{obj.name}_{suffix}.prefab";
+        string newPrefabPath = Path.Combine(prefabDir, newPrefabName);
+        GameObject? prefab = PrefabUtility.SaveAsPrefabAsset(obj, newPrefabPath);
+        if (prefab == null)
+        {
+            Debug.LogError("Failed to save prefab");
+            return null;
+        }
+
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
+
+        EditorUtility.FocusProjectWindow();
+        Selection.activeObject = prefab;
+        EditorGUIUtility.PingObject(prefab);
+
+        Debug.Log($"New prefab saved as {newPrefabPath}");
+        return prefab;
     }
 }

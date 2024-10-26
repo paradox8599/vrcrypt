@@ -49,7 +49,7 @@ public class XMenu : EditorWindow
         // Read
 
         GUI.enabled = xAvatar.isPrefab;
-        if (GUILayout.Button("Read") && GUI.enabled)
+        if (GUILayout.Button("Read") && xAvatar.isPrefab)
         {
             meshes = new Dictionary<string, XMesh>();
             foreach (var xMesh in xAvatar.meshes)
