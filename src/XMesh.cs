@@ -1,14 +1,26 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 
 [System.Serializable]
 public class XMesh
 {
-    public string path;
+    public static string savePath = "Assets/VRCrypt/Meshes";
+
+    public static string AssetPathFromHash(string hash) => Path.Combine(savePath, $"{hash}.asset");
+
+    private string _hash = null;
+    public string hash => _hash ??= ToHash();
+    public string assetPath => AssetPathFromHash(hash);
+
+    // mesh data
+
+    public string path; // path in gameobject
     public string name;
     public Vector3[] vertices;
     public int[] triangles;
@@ -20,11 +32,7 @@ public class XMesh
     public Vector3 boundsCenter;
     public Vector3 boundsExtents;
     public SubMeshDescriptor[] subMeshes;
-
-    // UV channels
     public List<List<Vector2>> uvs = new List<List<Vector2>>();
-
-    // Blend shapes
     public XBlendShape[] blendShapes;
 
     [DebuggerHidden]
@@ -73,12 +81,6 @@ public class XMesh
             blendShapes.Add(blendShape);
         }
         this.blendShapes = blendShapes.ToArray();
-    }
-
-    [DebuggerHidden]
-    public static XMesh New(Mesh mesh)
-    {
-        return new XMesh(mesh);
     }
 
     [DebuggerHidden]
@@ -162,5 +164,22 @@ public class XMesh
             builder.Append(b.ToString("x2"));
         }
         return builder.ToString();
+    }
+
+    public void SaveAsset()
+    {
+        if (!Directory.Exists(savePath))
+        {
+            Directory.CreateDirectory(savePath);
+        }
+        AssetDatabase.CreateAsset(ToMesh(), assetPath);
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+    }
+
+    public static XMesh? LoadAsset(string hash)
+    {
+        Mesh? mesh = AssetDatabase.LoadAssetAtPath<Mesh>(AssetPathFromHash(hash));
+        return mesh ? new XMesh(mesh) : null;
     }
 }

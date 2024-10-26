@@ -56,9 +56,20 @@ public class XMenu : EditorWindow
             }
         }
 
+        GUI.enabled = meshes != null;
+
+        // Save
+
+        if (GUILayout.Button("Save Meshes") && meshes != null)
+        {
+            foreach (var xMesh in meshes.Values)
+            {
+                xMesh.SaveAsset();
+            }
+        }
+
         // Write
 
-        GUI.enabled = meshes != null;
         if (GUILayout.Button("Write Meshes") && meshes != null)
         {
             // string prefabPath = AssetDatabase.GetAssetPath(avatar);
