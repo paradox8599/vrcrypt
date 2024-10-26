@@ -65,6 +65,7 @@ public class XMenu : EditorWindow
             foreach (var xMesh in meshes.Values)
             {
                 xMesh.SaveAsset();
+                xMesh.SaveEncoded();
             }
         }
 

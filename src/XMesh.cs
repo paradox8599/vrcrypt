@@ -12,15 +12,17 @@ public class XMesh
 {
     public static string savePath = "Assets/VRCrypt/Meshes";
 
-    public static string AssetPathFromHash(string hash) => Path.Combine(savePath, $"{hash}.asset");
+    public static string AssetPathFromHash(string hash, string ext = "asset") =>
+        Path.Combine(savePath, $"{hash}.{ext}");
 
-    private string _hash = null;
+    private string? _hash = null;
     public string hash => _hash ??= ToHash();
     public string assetPath => AssetPathFromHash(hash);
+    public string filePath => AssetPathFromHash(hash, "json");
 
     // mesh data
 
-    public string path; // path in gameobject
+    public string path;
     public string name;
     public Vector3[] vertices;
     public int[] triangles;
@@ -181,5 +183,16 @@ public class XMesh
     {
         Mesh? mesh = AssetDatabase.LoadAssetAtPath<Mesh>(AssetPathFromHash(hash));
         return mesh ? new XMesh(mesh) : null;
+    }
+
+    public void SaveEncoded()
+    {
+        File.WriteAllBytes(filePath, ToBytes());
+    }
+
+    public static XMesh? LoadEncoded(string hash)
+    {
+        byte[] data = File.ReadAllBytes(AssetPathFromHash(hash, "json"));
+        return XMesh.FromBytes(data);
     }
 }
