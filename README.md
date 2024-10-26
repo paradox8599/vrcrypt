@@ -22,3 +22,9 @@
 ### Build & Replace
 
 - `build.bat`
+
+## Logics
+
+- Read avatar from a prefab (in memory)
+- Read all gameobjects with meshes, record their path (save to Dict) (in memory)
+- Read all meshes, record their path (save to Dict) (in memory)

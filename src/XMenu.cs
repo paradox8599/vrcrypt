@@ -7,9 +7,8 @@ using Debug = UnityEngine.Debug;
 public class XMenu : EditorWindow
 {
     private Dictionary<string, XMesh>? meshes = null;
-    private GameObject? avatar = null;
+    private XGameObject? avatar = null;
     private Vector2 scrollPosition = Vector2.zero;
-    private float factor = 0.01f;
 
     [DebuggerHidden]
     [MenuItem("VRCrypt/Show")]
@@ -25,89 +24,80 @@ public class XMenu : EditorWindow
     {
         GUILayout.Label("VRCrypt", EditorStyles.boldLabel);
 
-        factor = GUILayout.HorizontalSlider(factor * 100, 0, 1) * 0.01f;
+        AvatarInput();
+        if (avatar == null)
+            return;
 
-        GUILayout.Label("Avatar", EditorStyles.boldLabel);
+        ReadPathsButton();
+        PathList();
+    }
 
-        // code = EditorGUILayout.TextField("Code", code);
-        avatar =
+    void AvatarInput()
+    {
+        var ago =
             EditorGUILayout.ObjectField(
                 "Avatar Prefab to Encrypt",
-                avatar,
+                avatar?.obj,
                 typeof(GameObject),
                 true
             ) as GameObject;
+        avatar = XGameObject.New(ago);
 
-        if (avatar == null)
+        if (this.avatar == null)
         {
             return;
         }
 
-        XGameObject xAvatar = new XGameObject(avatar);
-        if (!xAvatar.isPrefab)
+        if (!avatar.isPrefab)
         {
             EditorGUILayout.HelpBox(
                 "Please select an avatar prefab from Assets.",
                 MessageType.Warning
             );
         }
+    }
 
-        // Read
-
-        GUI.enabled = xAvatar.isPrefab;
-        if (GUILayout.Button("Read Meshes") && xAvatar.isPrefab)
+    void ReadPathsButton()
+    {
+        if (avatar == null)
+            return;
+        GUI.enabled = avatar.isPrefab;
+        if (GUILayout.Button("Read Paths"))
         {
-            XMesh? m = null;
-            meshes = new Dictionary<string, XMesh>();
-            foreach (var xMesh in xAvatar.GetChildMeshes())
+            Debug.Log("paths");
+            foreach (var xgo in avatar.GetAllChildrenWithMeshes())
             {
-                var x = xMesh.ToRandomized(factor);
-                var hash = x.ToHash();
-                x.path = xMesh.path;
-                x.SaveAsset();
-                meshes.Add(hash, x);
-                Debug.Log($"Read mesh: {hash}, {x.path}");
-                m ??= x;
-                break;
+                Debug.Log(xgo.path);
             }
-            var json = m?.ToJson();
-            Debug.Log($"input: {json}");
-            var output = FFI.read(json!);
-            Debug.Log($"output: {output}");
+            // XMesh? m = null;
+            // meshes = new Dictionary<string, XMesh>();
+            // foreach (var x in xAvatar.GetChildMeshes())
+            // {
+            //     var hash = x.ToHash();
+            //     x.SaveAsset();
+            //     meshes.Add(hash, x);
+            //     Debug.Log($"Read mesh: {hash}, {x.path}");
+            //     m ??= x;
+            // }
+            // var json = m?.ToJson();
+            // Debug.Log($"input: {json}");
+            // var output = FFI.read(json!);
+            // Debug.Log($"output: {output}");
         }
+    }
 
-        GUI.enabled = meshes != null;
-
-        // Write
-
-        if (GUILayout.Button("Write") && meshes != null)
-        {
-            var a = xAvatar.SavePrefab("vrcrypted", xAvatar.prefabDir)!;
-            foreach (var (hash, xMesh) in meshes!)
-            {
-                Debug.Log($"{hash}, {xMesh.path}");
-                var m = xMesh.LoadAsset()!;
-                Debug.Log($"Getting child: {xMesh.path}");
-                var go = a.GetChildAtPath(xMesh.pathSplit)!;
-                Debug.Log($"Child got: {go.obj.name}");
-                go.ApplyMesh(m);
-                Debug.Log($"Applied mesh: {hash}");
-            }
-        }
+    void PathList()
+    {
+        if (avatar == null)
+            return;
 
         GUI.enabled = true;
-
-        // List
-
         scrollPosition = GUILayout.BeginScrollView(scrollPosition);
         GUILayout.BeginVertical();
 
-        if (meshes != null)
+        foreach (XGameObject go in avatar.GetAllChildrenWithMeshes())
         {
-            foreach (var (hash, xMesh) in meshes)
-            {
-                GUILayout.Label($"{hash}: {xMesh.path}");
-            }
+            GUILayout.Label($"{go.obj.name}: {go.path}");
         }
 
         GUILayout.EndVertical();
