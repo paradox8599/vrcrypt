@@ -29,12 +29,6 @@ public class XMenu : EditorWindow
 
         GUILayout.Label("Avatar", EditorStyles.boldLabel);
 
-        if (GUILayout.Button("FFI"))
-        {
-            var str = FFI.read("hello");
-            Debug.Log(str);
-        }
-
         // code = EditorGUILayout.TextField("Code", code);
         avatar =
             EditorGUILayout.ObjectField(
@@ -60,10 +54,10 @@ public class XMenu : EditorWindow
 
         // Read
 
-
         GUI.enabled = xAvatar.isPrefab;
         if (GUILayout.Button("Read Meshes") && xAvatar.isPrefab)
         {
+            XMesh? m = null;
             meshes = new Dictionary<string, XMesh>();
             foreach (var xMesh in xAvatar.GetChildMeshes())
             {
@@ -73,7 +67,13 @@ public class XMenu : EditorWindow
                 x.SaveAsset();
                 meshes.Add(hash, x);
                 Debug.Log($"Read mesh: {hash}, {x.path}");
+                m ??= x;
+                break;
             }
+            var json = m?.ToJson();
+            Debug.Log($"input: {json}");
+            var output = FFI.read(json!);
+            Debug.Log($"output: {output}");
         }
 
         GUI.enabled = meshes != null;

@@ -39,19 +39,21 @@ public class XMesh
     public List<List<Vector2>> uvs = new List<List<Vector2>>();
     public XBlendShape[] blendShapes;
 
+    // Constructor
+
     [DebuggerHidden]
     public XMesh(Mesh mesh)
     {
         path = string.Empty;
         // Basic mesh data
-        name = mesh.name;
-        vertices = mesh.vertices;
-        triangles = mesh.triangles;
-        normals = mesh.normals;
-        tangents = mesh.tangents;
-        colors = mesh.colors;
-        boneWeights = mesh.boneWeights;
-        bindposes = mesh.bindposes;
+        name = mesh.name ?? string.Empty;
+        vertices = mesh.vertices ?? new Vector3[0];
+        triangles = mesh.triangles ?? new int[0];
+        normals = mesh.normals ?? new Vector3[0];
+        tangents = mesh.tangents ?? new Vector4[0];
+        colors = mesh.colors ?? new Color[0];
+        boneWeights = mesh.boneWeights ?? new BoneWeight[0];
+        bindposes = mesh.bindposes ?? new Matrix4x4[0];
         boundsCenter = mesh.bounds.center;
         boundsExtents = mesh.bounds.extents;
 
@@ -87,12 +89,28 @@ public class XMesh
         this.blendShapes = blendShapes.ToArray();
     }
 
+    // Deserialze to XMesh
+
     [DebuggerHidden]
     public static XMesh FromBytes(byte[] data)
     {
         string jsonString = Encoding.UTF8.GetString(data);
         return JsonUtility.FromJson<XMesh>(jsonString);
     }
+
+    // Deserialize to original mesh
+
+    public static Mesh? LoadAsset(string hash)
+    {
+        return AssetDatabase.LoadAssetAtPath<Mesh>(AssetPathFromHash(hash));
+    }
+
+    public Mesh? LoadAsset()
+    {
+        return AssetDatabase.LoadAssetAtPath<Mesh>(assetPath);
+    }
+
+    // Serialize
 
     [DebuggerHidden]
     public Mesh ToMesh()
@@ -179,53 +197,5 @@ public class XMesh
         AssetDatabase.CreateAsset(ToMesh(), assetPath);
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
-    }
-
-    public static Mesh? LoadAsset(string hash)
-    {
-        return AssetDatabase.LoadAssetAtPath<Mesh>(AssetPathFromHash(hash));
-    }
-
-    public Mesh? LoadAsset()
-    {
-        return AssetDatabase.LoadAssetAtPath<Mesh>(assetPath);
-    }
-
-    public void SaveEncoded()
-    {
-        File.WriteAllBytes(filePath, ToBytes());
-    }
-
-    public static XMesh? LoadEncoded(string hash)
-    {
-        byte[] data = File.ReadAllBytes(AssetPathFromHash(hash, "json"));
-        return XMesh.FromBytes(data);
-    }
-
-    public XMesh ToRandomized(float factor = 0.1f)
-    {
-        Mesh mesh = ToMesh();
-
-        // Get the vertices array
-        Vector3[] vertices = mesh.vertices;
-
-        // Iterate through the vertices and apply random offsets
-        for (int i = 0; i < vertices.Length; i++)
-        {
-            Vector3 randomOffset = new Vector3(
-                Random.Range(-factor, factor),
-                Random.Range(-factor, factor),
-                Random.Range(-factor, factor)
-            );
-
-            vertices[i] += randomOffset;
-        }
-
-        mesh.vertices = vertices;
-
-        mesh.RecalculateNormals();
-        mesh.RecalculateBounds();
-        XMesh xMesh = new XMesh(mesh);
-        return xMesh;
     }
 }
