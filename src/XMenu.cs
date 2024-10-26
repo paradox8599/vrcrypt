@@ -6,6 +6,8 @@ using Debug = UnityEngine.Debug;
 
 public class XMenu : EditorWindow
 {
+    public static string savePath = "Assets/VRCrypt/data";
+
     private Dictionary<string, XMesh>? meshes = null;
     private GameObject? avatar = null;
     private Vector2 scrollPosition = Vector2.zero;
@@ -26,8 +28,12 @@ public class XMenu : EditorWindow
 
         // code = EditorGUILayout.TextField("Code", code);
         avatar =
-            EditorGUILayout.ObjectField("Avatar Prefab", avatar, typeof(GameObject), true)
-            as GameObject;
+            EditorGUILayout.ObjectField(
+                "Avatar Prefab to Encrypt",
+                avatar,
+                typeof(GameObject),
+                true
+            ) as GameObject;
         if (avatar == null)
         {
             return;
@@ -71,18 +77,10 @@ public class XMenu : EditorWindow
 
         // Write
 
-        if (GUILayout.Button("Write Meshes") && meshes != null)
+        if (GUILayout.Button("Save Prefab") && meshes != null)
         {
-            // string prefabPath = AssetDatabase.GetAssetPath(avatar);
-            // Debug.Log($"Prefab path: {prefabPath}");
-            // GameObject prefabRoot = PrefabUtility.LoadPrefabContents(prefabPath);
-
-            // ...
-
-            // PrefabUtility.SaveAsPrefabAsset(prefabRoot, prefabPath);
-            // PrefabUtility.UnloadPrefabContents(prefabRoot);
-            // AssetDatabase.SaveAssets();
-            // AssetDatabase.Refresh();
+            // var date = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
+            xAvatar.SavePrefab();
         }
 
         GUI.enabled = true;

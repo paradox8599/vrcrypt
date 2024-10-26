@@ -10,10 +10,8 @@ using UnityEngine.Rendering;
 [System.Serializable]
 public class XMesh
 {
-    public static string savePath = "Assets/VRCrypt/Meshes";
-
     public static string AssetPathFromHash(string hash, string ext = "asset") =>
-        Path.Combine(savePath, $"{hash}.{ext}");
+        Path.Combine(XMenu.savePath, $"{hash}.{ext}");
 
     private string? _hash = null;
     public string hash => _hash ??= ToHash();
@@ -170,9 +168,9 @@ public class XMesh
 
     public void SaveAsset()
     {
-        if (!Directory.Exists(savePath))
+        if (!Directory.Exists(XMenu.savePath))
         {
-            Directory.CreateDirectory(savePath);
+            Directory.CreateDirectory(XMenu.savePath);
         }
         AssetDatabase.CreateAsset(ToMesh(), assetPath);
         AssetDatabase.SaveAssets();

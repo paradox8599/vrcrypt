@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 
@@ -91,10 +92,21 @@ public class XGameObject
         get { return GetChildMeshes(this); }
     }
 
-    public static bool IsPrefab(GameObject obj) => PrefabUtility.IsPartOfPrefabAsset(obj);
+    public static bool IsPrefab(GameObject obj) =>
+        PrefabUtility.GetPrefabAssetType(obj) != PrefabAssetType.NotAPrefab;
 
     public bool isPrefab
     {
         get => XGameObject.IsPrefab(this.obj);
+    }
+
+    public void SavePrefab(string alt = "vrcrypted")
+    {
+        string path = AssetDatabase.GetAssetPath(obj);
+        path = Path.GetDirectoryName(path);
+        path = Path.Combine(path, $"{obj.name}_{alt}.prefab");
+        PrefabUtility.SaveAsPrefabAsset(obj, path);
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
     }
 }
