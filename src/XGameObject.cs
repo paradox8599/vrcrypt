@@ -16,14 +16,17 @@ public class XGameObject
         // recursively find all parents and accumulately prepend their names
         get
         {
-            var _path = obj.name;
+            var _path = new List<string>();
+            _path.Add(obj.name);
             var parent = obj.transform.parent;
             while (parent != null)
             {
-                _path = $"{parent.name}/{_path}";
+                _path.Insert(0, parent.name);
                 parent = parent.parent;
             }
-            return _path;
+            // remove the root gameobject
+            _path.RemoveAt(0);
+            return string.Join("/", _path);
         }
     }
 
@@ -39,10 +42,20 @@ public class XGameObject
 
     public SkinnedMeshRenderer? smr => obj.GetComponent<SkinnedMeshRenderer>();
     public MeshFilter? mf => obj.GetComponent<MeshFilter>();
-    public XMesh? xMesh =>
-        smr != null ? new XMesh(smr.sharedMesh)
-        : mf != null ? new XMesh(mf.sharedMesh)
-        : null;
+    public XMesh? xMesh
+    {
+        get
+        {
+            var mesh =
+                smr != null ? new XMesh(smr.sharedMesh)
+                : mf != null ? new XMesh(mf.sharedMesh)
+                : null;
+            if (mesh == null)
+                return null;
+            mesh.path = path;
+            return mesh;
+        }
+    }
 
     public List<XGameObject> GetAllChildren(Transform? root = null)
     {
@@ -70,23 +83,18 @@ public class XGameObject
 
     public XGameObject InMemoryClone()
     {
-        var memoryCopy = Object.Instantiate(obj);
-        memoryCopy.hideFlags = HideFlags.HideAndDontSave;
-        memoryCopy.name = obj.name + " (Clone)";
-        memoryCopy.transform.parent = null;
-        memoryCopy.SetActive(false);
+        var memoryCopy = Object.Instantiate(obj.gameObject);
+        // memoryCopy.hideFlags = HideFlags.HideInHierarchy;
+        // memoryCopy.SetActive(false);
+        memoryCopy.name = obj.name;
+        memoryCopy.transform.SetParent(null, false);
         return new XGameObject(memoryCopy);
     }
 
     // With Side Effects
 
-    public XGameObject? SavePrefab(string suffix = "vrcrypted", string dir = "")
+    public XGameObject? SavePrefab(string dir, string suffix = "vrcrypted")
     {
-        if (!isPrefab)
-        {
-            return null;
-        }
-
         string newName = $"{obj.name}_{suffix}.prefab";
         string newPath = Path.Combine(dir, newName);
         GameObject? prefab = PrefabUtility.SaveAsPrefabAsset(obj, newPath);

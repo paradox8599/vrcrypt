@@ -16,12 +16,12 @@ pub fn unsafe_str(_attr: TokenStream, item: TokenStream) -> TokenStream {
         #input_fn
 
         /// # Safety
-        #[ffi_function]
+        #[interoptopus::ffi_function]
         #[no_mangle]
-        pub unsafe extern "C" fn #wrapper_fn_name(input: *const c_char) -> *mut c_char {
-            let input_str = CStr::from_ptr(input).to_str().unwrap_or("");
+        pub unsafe extern "C" fn #wrapper_fn_name(input: *const ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char {
+            let input_str = ::std::ffi::CStr::from_ptr(input).to_str().unwrap_or("");
             let output = #fn_name(input_str);
-            CString::new(output).unwrap().into_raw()
+            ::std::ffi::CString::new(output).unwrap().into_raw()
         }
     };
 

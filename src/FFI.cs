@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
+using UnityEngine;
 
-class FFI
+public class FFI
 {
     private delegate IntPtr StrFnInput(ref sbyte input);
     private delegate string StrFnOutput(string input);
@@ -39,10 +41,39 @@ class FFI
         };
     }
 
-    // ffi function callings
+    // ffi function wrappers
 
     public static string read(string input)
     {
-        return FFI.ReadString(RustNative.vrcrypt_lib.unsafe_read)(input);
+        var fn = FFI.ReadString(RustNative.vrcrypt_lib.unsafe_read);
+        return fn(input);
     }
+
+    /// Create Random Meshes
+
+    [System.Serializable]
+    public class CreateRandomMeshesInput
+    {
+        public List<XMesh> meshes;
+        public float factor;
+
+        public CreateRandomMeshesInput(List<XMesh> meshes, float factor)
+        {
+            this.meshes = meshes;
+            this.factor = factor;
+        }
+    }
+
+    public static XMeshes CreateRandomMeshes(CreateRandomMeshesInput input)
+    {
+        Debug.Log("input: " + input.factor);
+        var json = JsonUtility.ToJson(input, true);
+        Debug.Log("Json: " + json);
+        var fn = FFI.ReadString(RustNative.vrcrypt_lib.unsafe_create_random_meshes);
+        var output = fn(json);
+        Debug.Log("output: " + output);
+        return XMeshes.FromJson(output);
+    }
+
+    internal class SubMeshDescriptor { }
 }

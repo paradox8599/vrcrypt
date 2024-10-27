@@ -22,18 +22,51 @@ public class XMenu : EditorWindow
         GUILayout.Label("VRCrypt", EditorStyles.boldLabel);
 
         AvatarInput();
+
         if (avatar == null)
             return;
 
-        if (GUILayout.Button("ffi read"))
+        if (GUILayout.Button("ffi randomize"))
         {
-            var output = FFI.read("there");
-            Debug.Log(output);
+            // var input = new FFI.CreateRandomMeshesInput(avatar.GetAllMeshes(), 0.01f);
+            // var output = FFI.CreateRandomMeshes(input);
+            // var meshes = output.meshes;
+            var meshes = avatar
+                .GetAllMeshes()
+                .ConvertAll(x => JsonUtility.ToJson(x))
+                .ConvertAll(x => JsonUtility.FromJson<XMesh>(x));
+            var cloned = avatar.InMemoryClone();
+
+            foreach (var g in cloned.GetAllChildrenWithMeshes())
+            {
+                var xMesh = meshes.Find(x => x.path == g.path);
+                if (xMesh == null)
+                {
+                    Debug.LogError($"Mesh not found for: {g.path}");
+                }
+                xMesh!.SaveAsset();
+                var asset = xMesh!.LoadAsset();
+                if (asset == null)
+                {
+                    Debug.LogError($"Saved mesh assest not found: {g.path}");
+                }
+                g.ApplyMesh(asset!);
+            }
+            // cloned.SavePrefab(avatar.prefabDir);
         }
 
-        ReadPathsButton();
+        if (GUILayout.Button("compare"))
+        {
+            var x = new XGameObject(avatar.obj.transform.Find("Body").gameObject).xMesh;
+            var j1 = JsonUtility.ToJson(x);
+            var x2 = JsonUtility.FromJson<XMesh>(j1);
+            var m = x2.ToMesh();
+            var x3 = new XMesh(m);
+            var j2 = JsonUtility.ToJson(x3);
+            Debug.Log(j1 == j2);
+        }
 
-        PathList();
+        // ReadPathsButton();
     }
 
     /// Avatar Input Box
@@ -78,27 +111,5 @@ public class XMenu : EditorWindow
                 Debug.Log(xgo.path);
             }
         }
-    }
-
-    /// List paths of of all children with meshes
-
-    private Vector2 scrollPosition = Vector2.zero;
-
-    void PathList()
-    {
-        if (avatar == null)
-            return;
-
-        GUI.enabled = true;
-        scrollPosition = GUILayout.BeginScrollView(scrollPosition);
-        GUILayout.BeginVertical();
-
-        foreach (XGameObject go in avatar.GetAllChildrenWithMeshes())
-        {
-            GUILayout.Label(go.path);
-        }
-
-        GUILayout.EndVertical();
-        GUILayout.EndScrollView();
     }
 }

@@ -1,19 +1,21 @@
+use std::fmt::Display;
+
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone, Copy)]
 pub struct Vector2 {
     pub x: f64,
     pub y: f64,
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone, Copy)]
 pub struct Vector3 {
     pub x: f64,
     pub y: f64,
     pub z: f64,
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone, Copy)]
 pub struct Vector4 {
     pub x: f64,
     pub y: f64,
@@ -21,7 +23,7 @@ pub struct Vector4 {
     pub w: f64,
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone, Copy)]
 pub struct Matrix4x4 {
     pub e00: f64,
     pub e10: f64,
@@ -41,7 +43,7 @@ pub struct Matrix4x4 {
     pub e33: f64,
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone, Copy)]
 pub struct Color {
     pub r: f64,
     pub g: f64,
@@ -49,7 +51,7 @@ pub struct Color {
     pub a: f64,
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone, Copy)]
 pub struct BoneWeight {
     #[serde(rename = "m_BoneIndex0")]
     pub bone_index_0: i32,
@@ -69,13 +71,13 @@ pub struct BoneWeight {
     pub weight_3: f64,
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone, Copy)]
 pub struct Bounds {
     pub center: Vector3,
     pub extents: Vector3,
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone, Copy)]
 pub enum MeshTolopogy {
     #[default]
     Triangles = 0,
@@ -85,7 +87,7 @@ pub enum MeshTolopogy {
     Points = 5,
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone, Copy)]
 pub struct SubMeshDescriptor {
     pub bounds: Bounds,
     pub topology: MeshTolopogy,
@@ -101,22 +103,24 @@ pub struct SubMeshDescriptor {
     pub vertex_count: i32,
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct XBlendShape {
     pub name: String,
+    pub frames: Vec<XBlendShapeFrame>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct XBlendShapeFrame {
+    pub weight: f32,
     #[serde(rename = "deltaVertices")]
     pub delta_vertices: Vec<Vector3>,
     #[serde(rename = "deltaNormals")]
     pub delta_normals: Vec<Vector3>,
     #[serde(rename = "deltaTangents")]
     pub delta_tangents: Vec<Vector3>,
-    #[serde(rename = "frameWeight")]
-    pub frame_weight: f64,
-    #[serde(rename = "frameCount")]
-    pub frame_count: i32,
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone)]
 pub struct XMesh {
     pub path: String,
     pub name: String,
@@ -139,7 +143,28 @@ pub struct XMesh {
     pub blend_shapes: Vec<XBlendShape>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
-pub struct XMeshList {
+impl XMesh {
+    pub fn randomized(&self, factor: f64) -> XMesh {
+        self.clone()
+        // let mut mesh = self.clone();
+        // for v in mesh.vertices.iter_mut() {
+        //     *v = Vector3 {
+        //         x: v.x + (rand::random::<f64>() - 0.5) * factor,
+        //         y: v.y + (rand::random::<f64>() - 0.5) * factor,
+        //         z: v.z + (rand::random::<f64>() - 0.5) * factor,
+        //     };
+        // }
+        // mesh
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Default, Clone)]
+pub struct XMeshes {
     pub meshes: Vec<XMesh>,
+}
+
+impl Display for XMeshes {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", serde_json::to_string(&self).unwrap())
+    }
 }

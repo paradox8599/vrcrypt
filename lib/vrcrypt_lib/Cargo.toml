@@ -9,6 +9,7 @@ crate-type = ['cdylib', 'rlib']
 [dependencies]
 interoptopus = "0.14.18"
 interoptopus_backend_csharp = "0.14.18"
+rand = "0.8.5"
 serde = { version = "1.0.213", features = ["derive"] }
 serde_json = "1.0.132"
 unsafe_fn = { path = "macros/unsafe_fn" }
