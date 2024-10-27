@@ -1,4 +1,6 @@
+using System;
 using System.Diagnostics;
+using System.Text;
 using UnityEditor;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -55,16 +57,20 @@ public class XMenu : EditorWindow
             // cloned.SavePrefab(avatar.prefabDir);
         }
 
-        if (GUILayout.Button("compare"))
-        {
-            var x = new XGameObject(avatar.obj.transform.Find("Body").gameObject).xMesh;
-            var j1 = JsonUtility.ToJson(x);
-            var x2 = JsonUtility.FromJson<XMesh>(j1);
-            var m = x2.ToMesh();
-            var x3 = new XMesh(m);
-            var j2 = JsonUtility.ToJson(x3);
-            Debug.Log(j1 == j2);
-        }
+        // if (GUILayout.Button("compare"))
+        // {
+        //     var x = new XGameObject(avatar.obj.transform.Find("Body").gameObject).xMesh;
+        //     var j1 = JsonUtility.ToJson(x);
+        //     var x2 = JsonUtility.FromJson<XMesh>(j1);
+        //
+        //     var m = x2.ToMesh();
+        //     var x3 = new XMesh(m);
+        //     x3.path = x!.path;
+        //     var j2 = JsonUtility.ToJson(x3);
+        //
+        //     Debug.Log(j1 == j2);
+        //     Debug.Log(Utils.CompareStrings(j1, j2));
+        // }
 
         // ReadPathsButton();
     }

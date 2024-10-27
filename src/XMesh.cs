@@ -5,7 +5,6 @@ using System.Security.Cryptography;
 using System.Text;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 [System.Serializable]
 public class XMeshes
@@ -48,14 +47,15 @@ public class XMesh
     public string name;
     public Vector3[] vertices;
     public int[] triangles;
-    public Vector3[] normals;
     public Vector4[] tangents;
-    public Color[] colors;
+    public XColor[] colors;
     public BoneWeight[] boneWeights;
     public Matrix4x4[] bindposes;
-    public Vector3 boundsCenter;
-    public Vector3 boundsExtents;
-    public SubMeshDescriptor[]? subMeshes;
+
+    // public Vector3[] normals;
+    // public XBounds bounds;
+
+    public List<XSubMeshDescriptor>? subMeshes = new List<XSubMeshDescriptor>();
     public List<Vector2[]>? uvs = new List<Vector2[]>();
     public XBlendShape[] blendShapes;
 
@@ -63,67 +63,32 @@ public class XMesh
 
     public XMesh(Mesh mesh)
     {
-        UnityEngine.Debug.Log("XMesh");
-        if (mesh.vertices.Length == 0)
-        {
-            UnityEngine.Debug.LogError("No vertices");
-        }
-        if (mesh.triangles.Length == 0)
-        {
-            UnityEngine.Debug.LogError("No triangles");
-        }
-        if (mesh.normals.Length == 0)
-        {
-            UnityEngine.Debug.LogError("No normals");
-        }
-        if (mesh.colors.Length == 0)
-        {
-            UnityEngine.Debug.LogError("No colors");
-        }
-        if (mesh.boneWeights.Length == 0)
-        {
-            UnityEngine.Debug.LogError("No boneWeights");
-        }
-        if (mesh.bindposes.Length == 0)
-        {
-            UnityEngine.Debug.LogError("No bindposes");
-        }
-        if (mesh.blendShapeCount == 0)
-        {
-            UnityEngine.Debug.LogError("No blendShapes");
-        }
-        if (mesh.subMeshCount == 0)
-        {
-            UnityEngine.Debug.LogError("No subMeshes");
-        }
-
         path = string.Empty;
         name = mesh.name;
         vertices = mesh.vertices;
         triangles = mesh.triangles;
-        normals = mesh.normals;
         tangents = mesh.tangents;
-        colors = mesh.colors;
+        colors = XColor.FromColors(mesh.colors);
         boneWeights = mesh.boneWeights;
         bindposes = mesh.bindposes;
-        boundsCenter = mesh.bounds.center;
-        boundsExtents = mesh.bounds.extents;
 
-        subMeshes = new SubMeshDescriptor[mesh.subMeshCount];
-        for (int i = 0; i < mesh.subMeshCount; i++)
-        {
-            subMeshes[i] = mesh.GetSubMesh(i);
-        }
+        mesh.RecalculateBounds();
+        mesh.RecalculateNormals();
+        // normals = mesh.normals;
+        // bounds = new XBounds(mesh.bounds);
 
         uvs = new List<Vector2[]>();
-        uvs.Add(mesh.uv);
-        uvs.Add(mesh.uv2);
-        uvs.Add(mesh.uv3);
-        uvs.Add(mesh.uv4);
-        uvs.Add(mesh.uv5);
-        uvs.Add(mesh.uv6);
-        uvs.Add(mesh.uv7);
-        uvs.Add(mesh.uv8);
+        for (int i = 0; i < 8; i++)
+        {
+            var o = new List<Vector2>();
+            mesh.GetUVs(i, o);
+            uvs.Add(o.ToArray());
+        }
+
+        for (int i = 0; i < mesh.subMeshCount; i++)
+        {
+            subMeshes.Add(new XSubMeshDescriptor(mesh.GetSubMesh(i)));
+        }
 
         blendShapes = new XBlendShape[mesh.blendShapeCount];
         for (int i = 0; i < mesh.blendShapeCount; i++)
@@ -145,59 +110,21 @@ public class XMesh
 
     public Mesh ToMesh()
     {
-        UnityEngine.Debug.Log("ToMesh: " + name);
-        if (vertices.Length == 0)
-        {
-            UnityEngine.Debug.LogError("No vertices");
-        }
-        if (triangles.Length == 0)
-        {
-            UnityEngine.Debug.LogError("No triangles");
-        }
-        if (normals.Length == 0)
-        {
-            UnityEngine.Debug.LogError("No normals");
-        }
-        if (colors.Length == 0)
-        {
-            UnityEngine.Debug.LogError("No colors");
-        }
-        if (boneWeights.Length == 0)
-        {
-            UnityEngine.Debug.LogError("No boneWeights");
-        }
-        if (bindposes.Length == 0)
-        {
-            UnityEngine.Debug.LogError("No bindposes");
-        }
-        if (blendShapes.Length == 0)
-        {
-            UnityEngine.Debug.LogError("No blendShapes");
-        }
-        if (subMeshes == null || subMeshes.Length == 0)
-        {
-            UnityEngine.Debug.LogError("No subMeshes");
-        }
         Mesh mesh = new Mesh();
         mesh.name = name;
 
         mesh.vertices = vertices;
 
         mesh.triangles = triangles;
-
-        mesh.normals = normals;
         mesh.tangents = tangents;
-        mesh.colors = colors;
+        mesh.colors = XColor.ToColors(colors);
         mesh.boneWeights = boneWeights;
         mesh.bindposes = bindposes;
-        mesh.bounds = new Bounds(boundsCenter, boundsExtents * 2);
 
-        mesh.SetSubMeshes(subMeshes);
-        // mesh.subMeshCount = subMeshes != null ? subMeshes.Length : 0;
-        // for (int i = 0; subMeshes != null && i < subMeshes.Length; i++)
-        // {
-        //     mesh.SetSubMesh(i, subMeshes[i]);
-        // }
+        if (subMeshes != null)
+        {
+            mesh.SetSubMeshes(subMeshes.ConvertAll(x => x.ToSubMeshDescriptor()));
+        }
 
         if (uvs != null)
         {
@@ -212,6 +139,8 @@ public class XMesh
             blendShapes[i].ApplyToMesh(mesh);
         }
 
+        // mesh.bounds = bounds.ToBounds();
+        // mesh.normals = normals;
         mesh.RecalculateBounds();
         mesh.RecalculateNormals();
 
