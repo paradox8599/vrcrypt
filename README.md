@@ -4,6 +4,8 @@
 
 ### Link Dlls
 
+> Unity Editor 2022.3.22f1
+
 - `ln -s <Unity Editor>\Data\Managed\UnityEditor.dll refs\UnityEditor.dll`
 - `ln -s <Unity Editor>\Data\Managed\UnityEngine.dll refs\UnityEngine.dll`
 - `ln -s <Project>\Packages\com.vrchat.avatars\Runtime\VRCSDK\Plugins\VRCSDK3A.dll refs\VRCSDK3A.dll`
@@ -22,6 +24,8 @@
 ### Build & Replace
 
 - `build.bat`
+
+> A rebuild is required after each rust build
 
 ## Logics
 

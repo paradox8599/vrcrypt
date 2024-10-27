@@ -21,6 +21,7 @@
       <HintPath>refs/VRCSDKBase.dll</HintPath>
      </Reference>
      <Compile Include="D:\Unity\Projects\mate\Assets\RustNative\vrcrypt_lib\vrcrypt_lib.cs" />
+     <Compile Remove="lib\**\*.cs" />
   </ItemGroup>
 
 

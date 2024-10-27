@@ -1,0 +1,14 @@
+[package]
+name = "vrcrypt_lib"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ['cdylib', 'rlib']
+
+[dependencies]
+interoptopus = "0.14.18"
+interoptopus_backend_csharp = "0.14.18"
+serde = { version = "1.0.213", features = ["derive"] }
+serde_json = "1.0.132"
+unsafe_fn = { path = "macros/unsafe_fn" }
