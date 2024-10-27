@@ -8,6 +8,17 @@ using UnityEngine;
 using UnityEngine.Rendering;
 
 [System.Serializable]
+public class XMeshList
+{
+    public List<XMesh> meshes;
+
+    public XMeshList(List<XMesh> meshes)
+    {
+        this.meshes = meshes;
+    }
+}
+
+[System.Serializable]
 public class XMesh
 {
     public static string savePath = "Assets/VRCrypt/data";
@@ -156,10 +167,7 @@ public class XMesh
     }
 
     [DebuggerHidden]
-    public string ToJson() => JsonUtility.ToJson(this);
-
-    [DebuggerHidden]
-    public byte[] ToBytes() => Encoding.UTF8.GetBytes(ToJson());
+    public byte[] ToBytes() => Encoding.UTF8.GetBytes(JsonUtility.ToJson(this));
 
     [DebuggerHidden]
     public byte[] ToHashBytes()

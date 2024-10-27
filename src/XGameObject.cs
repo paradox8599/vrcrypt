@@ -29,10 +29,6 @@ public class XGameObject
 
     public XGameObject(GameObject obj)
     {
-        if (obj == null)
-        {
-            throw new System.ArgumentNullException(nameof(obj));
-        }
         this.obj = obj;
     }
 
@@ -63,7 +59,7 @@ public class XGameObject
     public List<XGameObject> GetAllChildrenWithMeshes() =>
         GetAllChildren().FindAll(x => x.xMesh != null);
 
-    public List<XMesh> GetAllMeshes() => GetAllChildrenWithMeshes().ConvertAll(x => x.xMesh!);
+    public List<XMesh> GetAllMeshes() => GetAllChildrenWithMeshes().ConvertAll(x => x.xMesh!)!;
 
     public Mesh? ApplyMesh(Mesh mesh) =>
         smr != null ? (smr.sharedMesh = mesh)
@@ -72,7 +68,7 @@ public class XGameObject
 
     public bool isPrefab => XGameObject.IsPrefab(this.obj);
 
-    public XGameObject MemoryClone()
+    public XGameObject InMemoryClone()
     {
         var memoryCopy = Object.Instantiate(obj);
         memoryCopy.hideFlags = HideFlags.HideAndDontSave;

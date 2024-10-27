@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEditor;
 using UnityEngine;
@@ -6,9 +5,7 @@ using Debug = UnityEngine.Debug;
 
 public class XMenu : EditorWindow
 {
-    private Dictionary<string, XMesh>? meshes = null;
     private XGameObject? avatar = null;
-    private Vector2 scrollPosition = Vector2.zero;
 
     [DebuggerHidden]
     [MenuItem("VRCrypt/Show")]
@@ -73,24 +70,12 @@ public class XMenu : EditorWindow
             {
                 Debug.Log(xgo.path);
             }
-            // XMesh? m = null;
-            // meshes = new Dictionary<string, XMesh>();
-            // foreach (var x in xAvatar.GetChildMeshes())
-            // {
-            //     var hash = x.ToHash();
-            //     x.SaveAsset();
-            //     meshes.Add(hash, x);
-            //     Debug.Log($"Read mesh: {hash}, {x.path}");
-            //     m ??= x;
-            // }
-            // var json = m?.ToJson();
-            // Debug.Log($"input: {json}");
-            // var output = FFI.read(json!);
-            // Debug.Log($"output: {output}");
         }
     }
 
     /// List paths of of all children with meshes
+
+    private Vector2 scrollPosition = Vector2.zero;
 
     void PathList()
     {
@@ -103,7 +88,7 @@ public class XMenu : EditorWindow
 
         foreach (XGameObject go in avatar.GetAllChildrenWithMeshes())
         {
-            GUILayout.Label($"{go.obj.name}: {go.path}");
+            GUILayout.Label(go.path);
         }
 
         GUILayout.EndVertical();
