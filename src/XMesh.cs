@@ -15,6 +15,9 @@ public class XMesh
     public static string AssetPathFromHash(string hash, string ext = "asset") =>
         Path.Combine(savePath, $"{hash}.{ext}");
 
+    public static Mesh? LoadAsset(string hash) =>
+        AssetDatabase.LoadAssetAtPath<Mesh>(AssetPathFromHash(hash));
+
     private string? _hash = null;
     public string hash => _hash ??= ToHash();
     public string assetPath => AssetPathFromHash(hash);
@@ -39,7 +42,7 @@ public class XMesh
     public List<List<Vector2>> uvs = new List<List<Vector2>>();
     public XBlendShape[] blendShapes;
 
-    // Constructor
+    // Constructor & Deserialzions
 
     [DebuggerHidden]
     public XMesh(Mesh mesh)
@@ -89,8 +92,6 @@ public class XMesh
         this.blendShapes = blendShapes.ToArray();
     }
 
-    // Deserialze to XMesh
-
     [DebuggerHidden]
     public static XMesh FromBytes(byte[] data)
     {
@@ -98,17 +99,7 @@ public class XMesh
         return JsonUtility.FromJson<XMesh>(jsonString);
     }
 
-    // Deserialize to original mesh
-
-    public static Mesh? LoadAsset(string hash)
-    {
-        return AssetDatabase.LoadAssetAtPath<Mesh>(AssetPathFromHash(hash));
-    }
-
-    public Mesh? LoadAsset()
-    {
-        return AssetDatabase.LoadAssetAtPath<Mesh>(assetPath);
-    }
+    public Mesh? LoadAsset() => AssetDatabase.LoadAssetAtPath<Mesh>(assetPath);
 
     // Serialize
 
@@ -187,6 +178,8 @@ public class XMesh
         }
         return builder.ToString();
     }
+
+    // Side Effects
 
     public void SaveAsset()
     {

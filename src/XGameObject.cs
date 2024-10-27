@@ -41,8 +41,8 @@ public class XGameObject
         return obj == null ? null : new XGameObject(obj);
     }
 
-    public SkinnedMeshRenderer? smr => obj!.GetComponent<SkinnedMeshRenderer>();
-    public MeshFilter? mf => obj!.GetComponent<MeshFilter>();
+    public SkinnedMeshRenderer? smr => obj.GetComponent<SkinnedMeshRenderer>();
+    public MeshFilter? mf => obj.GetComponent<MeshFilter>();
     public XMesh? xMesh =>
         smr != null ? new XMesh(smr.sharedMesh)
         : mf != null ? new XMesh(mf.sharedMesh)
@@ -50,7 +50,7 @@ public class XGameObject
 
     public List<XGameObject> GetAllChildren(Transform? root = null)
     {
-        root ??= obj!.transform;
+        root ??= obj.transform;
         List<XGameObject> children = new List<XGameObject>();
         foreach (Transform child in root)
         {
@@ -81,6 +81,8 @@ public class XGameObject
         memoryCopy.SetActive(false);
         return new XGameObject(memoryCopy);
     }
+
+    // With Side Effects
 
     public XGameObject? SavePrefab(string suffix = "vrcrypted", string dir = "")
     {
