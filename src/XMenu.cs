@@ -32,6 +32,8 @@ public class XMenu : EditorWindow
         PathList();
     }
 
+    /// Avatar Input Box
+
     void AvatarInput()
     {
         var ago =
@@ -56,6 +58,8 @@ public class XMenu : EditorWindow
             );
         }
     }
+
+    /// Read Paths of all children with meshes of the avatar
 
     void ReadPathsButton()
     {
@@ -85,6 +89,8 @@ public class XMenu : EditorWindow
             // Debug.Log($"output: {output}");
         }
     }
+
+    /// List paths of of all children with meshes
 
     void PathList()
     {
