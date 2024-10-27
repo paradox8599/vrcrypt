@@ -90,7 +90,7 @@ pub enum MeshTolopogy {
 #[derive(Serialize, Deserialize, Debug, Default, Clone, Copy)]
 pub struct SubMeshDescriptor {
     pub bounds: Bounds,
-    pub topology: MeshTolopogy,
+    pub topology: i32,
     #[serde(rename = "indexStart")]
     pub index_start: i32,
     #[serde(rename = "indexCount")]
@@ -126,35 +126,36 @@ pub struct XMesh {
     pub name: String,
     pub vertices: Vec<Vector3>,
     pub triangles: Vec<i32>,
-    pub normals: Vec<Vector3>,
     pub tangents: Vec<Vector4>,
     pub colors: Vec<Color>,
     #[serde(rename = "boneWeights")]
     pub bone_weights: Vec<BoneWeight>,
     pub bindposes: Vec<Matrix4x4>,
-    #[serde(rename = "boundsCenter")]
-    pub bounds_center: Vector3,
-    #[serde(rename = "boundsExtents")]
-    pub bounds_extents: Vector3,
-    #[serde(rename = "subMeshes")]
-    pub sub_meshes: Option<Vec<SubMeshDescriptor>>,
-    pub uvs: Option<Vec<Vec<Vector2>>>,
     #[serde(rename = "blendShapes")]
     pub blend_shapes: Vec<XBlendShape>,
+    #[serde(rename = "subMeshes")]
+    pub sub_meshes: Vec<SubMeshDescriptor>,
+    pub uv: Vec<Vector2>,
+    pub uv2: Vec<Vector2>,
+    pub uv3: Vec<Vector2>,
+    pub uv4: Vec<Vector2>,
+    pub uv5: Vec<Vector2>,
+    pub uv6: Vec<Vector2>,
+    pub uv7: Vec<Vector2>,
+    pub uv8: Vec<Vector2>,
 }
 
 impl XMesh {
     pub fn randomized(&self, factor: f64) -> XMesh {
-        self.clone()
-        // let mut mesh = self.clone();
-        // for v in mesh.vertices.iter_mut() {
-        //     *v = Vector3 {
-        //         x: v.x + (rand::random::<f64>() - 0.5) * factor,
-        //         y: v.y + (rand::random::<f64>() - 0.5) * factor,
-        //         z: v.z + (rand::random::<f64>() - 0.5) * factor,
-        //     };
-        // }
-        // mesh
+        let mut mesh = self.clone();
+        for v in mesh.vertices.iter_mut() {
+            *v = Vector3 {
+                x: v.x + (rand::random::<f64>() - 0.5) * factor,
+                y: v.y + (rand::random::<f64>() - 0.5) * factor,
+                z: v.z + (rand::random::<f64>() - 0.5) * factor,
+            };
+        }
+        mesh
     }
 }
 

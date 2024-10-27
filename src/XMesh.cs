@@ -39,11 +39,11 @@ public class XMesh
     public string assetPath => AssetPathFromHash(hash);
     public string filePath => AssetPathFromHash(hash, "json");
 
-    public string path;
     public string[] pathSplit => path.TrimStart('/').Split('/');
 
     // mesh data
 
+    public string path;
     public string name;
     public Vector3[] vertices;
     public int[] triangles;
@@ -51,13 +51,19 @@ public class XMesh
     public XColor[] colors;
     public BoneWeight[] boneWeights;
     public Matrix4x4[] bindposes;
+    public XBlendShape[] blendShapes;
+    public List<XSubMeshDescriptor> subMeshes = new List<XSubMeshDescriptor>();
+    public Vector2[] uv;
+    public Vector2[] uv2;
+    public Vector2[] uv3;
+    public Vector2[] uv4;
+    public Vector2[] uv5;
+    public Vector2[] uv6;
+    public Vector2[] uv7;
+    public Vector2[] uv8;
 
     // public Vector3[] normals;
     // public XBounds bounds;
-
-    public List<XSubMeshDescriptor>? subMeshes = new List<XSubMeshDescriptor>();
-    public List<Vector2[]>? uvs = new List<Vector2[]>();
-    public XBlendShape[] blendShapes;
 
     // Constructor & Deserialzions
 
@@ -77,13 +83,14 @@ public class XMesh
         // normals = mesh.normals;
         // bounds = new XBounds(mesh.bounds);
 
-        uvs = new List<Vector2[]>();
-        for (int i = 0; i < 8; i++)
-        {
-            var o = new List<Vector2>();
-            mesh.GetUVs(i, o);
-            uvs.Add(o.ToArray());
-        }
+        uv = mesh.uv;
+        uv2 = mesh.uv2;
+        uv3 = mesh.uv3;
+        uv4 = mesh.uv4;
+        uv5 = mesh.uv5;
+        uv6 = mesh.uv6;
+        uv7 = mesh.uv7;
+        uv8 = mesh.uv8;
 
         for (int i = 0; i < mesh.subMeshCount; i++)
         {
@@ -121,18 +128,16 @@ public class XMesh
         mesh.boneWeights = boneWeights;
         mesh.bindposes = bindposes;
 
-        if (subMeshes != null)
-        {
-            mesh.SetSubMeshes(subMeshes.ConvertAll(x => x.ToSubMeshDescriptor()));
-        }
+        mesh.SetSubMeshes(subMeshes.ConvertAll(x => x.ToSubMeshDescriptor()));
 
-        if (uvs != null)
-        {
-            for (int i = 0; i < uvs.Count; i++)
-            {
-                mesh.SetUVs(i, uvs[i]);
-            }
-        }
+        mesh.uv = uv;
+        mesh.uv2 = uv2;
+        mesh.uv3 = uv3;
+        mesh.uv4 = uv4;
+        mesh.uv5 = uv5;
+        mesh.uv6 = uv6;
+        mesh.uv7 = uv7;
+        mesh.uv8 = uv8;
 
         for (int i = 0; i < blendShapes.Length; i++)
         {

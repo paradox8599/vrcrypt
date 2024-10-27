@@ -1,6 +1,4 @@
-using System;
 using System.Diagnostics;
-using System.Text;
 using UnityEditor;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -30,13 +28,14 @@ public class XMenu : EditorWindow
 
         if (GUILayout.Button("ffi randomize"))
         {
-            // var input = new FFI.CreateRandomMeshesInput(avatar.GetAllMeshes(), 0.01f);
-            // var output = FFI.CreateRandomMeshes(input);
-            // var meshes = output.meshes;
-            var meshes = avatar
-                .GetAllMeshes()
-                .ConvertAll(x => JsonUtility.ToJson(x))
-                .ConvertAll(x => JsonUtility.FromJson<XMesh>(x));
+            var allmeshes = avatar.GetAllMeshes();
+            var input = new FFI.CreateRandomMeshesInput(allmeshes, 0.01f);
+            var output = FFI.CreateRandomMeshes(input);
+            var meshes = output.meshes;
+            // var meshes = avatar
+            //     .GetAllMeshes()
+            //     .ConvertAll(x => JsonUtility.ToJson(x))
+            //     .ConvertAll(x => JsonUtility.FromJson<XMesh>(x));
             var cloned = avatar.InMemoryClone();
 
             foreach (var g in cloned.GetAllChildrenWithMeshes())
@@ -54,23 +53,23 @@ public class XMenu : EditorWindow
                 }
                 g.ApplyMesh(asset!);
             }
-            // cloned.SavePrefab(avatar.prefabDir);
+            cloned.SavePrefab(avatar.prefabDir);
         }
 
-        // if (GUILayout.Button("compare"))
-        // {
-        //     var x = new XGameObject(avatar.obj.transform.Find("Body").gameObject).xMesh;
-        //     var j1 = JsonUtility.ToJson(x);
-        //     var x2 = JsonUtility.FromJson<XMesh>(j1);
-        //
-        //     var m = x2.ToMesh();
-        //     var x3 = new XMesh(m);
-        //     x3.path = x!.path;
-        //     var j2 = JsonUtility.ToJson(x3);
-        //
-        //     Debug.Log(j1 == j2);
-        //     Debug.Log(Utils.CompareStrings(j1, j2));
-        // }
+        if (GUILayout.Button("compare"))
+        {
+            var x = new XGameObject(avatar.obj.transform.Find("Body").gameObject).xMesh;
+            var j1 = JsonUtility.ToJson(x);
+            var x2 = JsonUtility.FromJson<XMesh>(j1);
+
+            var m = x2.ToMesh();
+            var x3 = new XMesh(m);
+            x3.path = x!.path;
+            var j2 = JsonUtility.ToJson(x3);
+
+            Debug.Log(j1 == j2);
+            Debug.Log(Utils.CompareStrings(j1, j2));
+        }
 
         // ReadPathsButton();
     }

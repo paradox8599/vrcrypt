@@ -10,6 +10,9 @@ struct CreateRandomMeshesInput {
 
 #[unsafe_str]
 fn create_random_meshes(input: &str) -> String {
+    let save = || {
+        std::fs::write("Assets/VRCrypt/meshes.json", input);
+    };
     let input = serde_json::from_str::<CreateRandomMeshesInput>(input).map_err(|e| e.to_string());
     match input {
         Ok(input) => {
@@ -20,6 +23,9 @@ fn create_random_meshes(input: &str) -> String {
                 .collect::<Vec<_>>();
             XMeshes { meshes }.to_string()
         }
-        Err(e) => e,
+        Err(e) => {
+            save();
+            return e;
+        }
     }
 }

@@ -66,7 +66,6 @@ public class FFI
 
     public static XMeshes CreateRandomMeshes(CreateRandomMeshesInput input)
     {
-        Debug.Log("input: " + input.factor);
         var json = JsonUtility.ToJson(input, true);
         Debug.Log("Json: " + json);
         var fn = FFI.ReadString(RustNative.vrcrypt_lib.unsafe_create_random_meshes);
