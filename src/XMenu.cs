@@ -25,7 +25,14 @@ public class XMenu : EditorWindow
         if (avatar == null)
             return;
 
+        if (GUILayout.Button("ffi read"))
+        {
+            var output = FFI.read("there");
+            Debug.Log(output);
+        }
+
         ReadPathsButton();
+
         PathList();
     }
 

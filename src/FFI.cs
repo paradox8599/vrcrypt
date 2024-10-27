@@ -43,6 +43,6 @@ class FFI
 
     public static string read(string input)
     {
-        return FFI.ReadString(RustNative.vrcrypt_lib.read)(input);
+        return FFI.ReadString(RustNative.vrcrypt_lib.unsafe_read)(input);
     }
 }
