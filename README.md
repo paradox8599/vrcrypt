@@ -34,3 +34,12 @@
   - Read all gameobjects with meshes, record their path (save to Dict) (in memory)
   - Read all meshes, record their path (save to Dict) (in memory)
 - Decryption
+
+## TODOs
+
+- encrypt gameobjects
+- Process fbx & meshes in rust
+  - https://github.com/I3ck/rust-3d
+  - https://github.com/lo48576/fbxcel
+  - https://github.com/lo48576/fbxcel-dom
+  - https://github.com/lo48576/fbx-viewer
