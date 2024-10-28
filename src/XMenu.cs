@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEditor;
 using UnityEngine;
@@ -6,6 +7,7 @@ using Debug = UnityEngine.Debug;
 public class XMenu : EditorWindow
 {
     private XGameObject? avatar = null;
+    private bool ffi = true;
 
     [DebuggerHidden]
     [MenuItem("VRCrypt/Show")]
@@ -26,16 +28,30 @@ public class XMenu : EditorWindow
         if (avatar == null)
             return;
 
+        ffi = EditorGUILayout.Toggle("Use FFI", ffi);
+
         if (GUILayout.Button("ffi randomize"))
         {
             var allmeshes = avatar.GetAllMeshes();
-            var input = new FFI.CreateRandomMeshesInput(allmeshes, 0.01f);
-            var output = FFI.CreateRandomMeshes(input);
-            var meshes = output.meshes;
-            // var meshes = avatar
-            //     .GetAllMeshes()
-            //     .ConvertAll(x => JsonUtility.ToJson(x))
-            //     .ConvertAll(x => JsonUtility.FromJson<XMesh>(x));
+
+            var ffi_meshes = new List<XMesh>();
+            foreach (var x in allmeshes)
+            {
+                var m = new List<XMesh>();
+                m.Add(x);
+                var input = new FFI.CreateRandomMeshesInput(m, 0.01f);
+                var output = FFI.CreateRandomMeshes(input);
+                ffi_meshes.Add(output.meshes[0]);
+            }
+
+            var cs_meshes = avatar
+                .GetAllMeshes()
+                .ConvertAll(x => x.ToRandomized())
+                .ConvertAll(x => JsonUtility.ToJson(x))
+                .ConvertAll(x => JsonUtility.FromJson<XMesh>(x));
+
+            var meshes = ffi ? ffi_meshes : cs_meshes;
+
             var cloned = avatar.InMemoryClone();
 
             foreach (var g in cloned.GetAllChildrenWithMeshes())

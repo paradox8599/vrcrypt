@@ -62,9 +62,6 @@ public class XMesh
     public Vector2[] uv7;
     public Vector2[] uv8;
 
-    // public Vector3[] normals;
-    // public XBounds bounds;
-
     // Constructor & Deserialzions
 
     public XMesh(Mesh mesh)
@@ -77,11 +74,6 @@ public class XMesh
         colors = XColor.FromColors(mesh.colors);
         boneWeights = mesh.boneWeights;
         bindposes = mesh.bindposes;
-
-        mesh.RecalculateBounds();
-        mesh.RecalculateNormals();
-        // normals = mesh.normals;
-        // bounds = new XBounds(mesh.bounds);
 
         uv = mesh.uv;
         uv2 = mesh.uv2;
@@ -144,8 +136,6 @@ public class XMesh
             blendShapes[i].ApplyToMesh(mesh);
         }
 
-        // mesh.bounds = bounds.ToBounds();
-        // mesh.normals = normals;
         mesh.RecalculateBounds();
         mesh.RecalculateNormals();
 

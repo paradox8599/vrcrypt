@@ -4,55 +4,73 @@ using System.Runtime.InteropServices;
 using System.Text;
 using UnityEngine;
 
-public class FFI
+internal class FFI
 {
-    private delegate IntPtr StrFnInput(ref sbyte input);
-    private delegate string StrFnOutput(string input);
+    delegate IntPtr StrFnIn(ref sbyte input);
+    delegate string StrFnOut(string input);
 
-    private static StrFnOutput ReadString(StrFnInput strFn)
+    class StringHandle : SafeHandle
     {
-        return (string input) =>
-        {
-            // Convert input string to UTF-8 encoded byte array
-            byte[] inputBytes = Encoding.UTF8.GetBytes(input + "\0");
-            IntPtr outputPtr = IntPtr.Zero;
+        public StringHandle()
+            : base(IntPtr.Zero, true) { }
 
-            try
+        public override bool IsInvalid => handle == IntPtr.Zero;
+
+        public static StringHandle FromFunction(StrFnIn ffiFunction, string input)
+        {
+            byte[] inputBytes = Encoding.UTF8.GetBytes(input + "\0");
+            unsafe
+            {
+                fixed (byte* inputPtr = inputBytes)
+                {
+                    IntPtr ptr = ffiFunction(ref *(sbyte*)inputPtr);
+                    return new StringHandle { handle = ptr };
+                }
+            }
+        }
+
+        public string AsString()
+        {
+            int len = 0;
+            while (Marshal.ReadByte(handle, len) != 0)
+            {
+                ++len;
+            }
+            byte[] buffer = new byte[len];
+            Marshal.Copy(handle, buffer, 0, buffer.Length);
+            return Encoding.UTF8.GetString(buffer);
+        }
+
+        protected override bool ReleaseHandle()
+        {
+            if (!IsInvalid)
             {
                 unsafe
                 {
-                    fixed (byte* inputPtr = inputBytes)
-                    {
-                        outputPtr = strFn(ref *(sbyte*)inputPtr);
-                    }
+                    sbyte* ptrAsSByte = (sbyte*)handle.ToPointer();
+                    RustNative.vrcrypt_lib.unsafe_free_str(out *ptrAsSByte);
+                    handle = IntPtr.Zero;
                 }
-
-                return Marshal.PtrToStringAnsi(outputPtr);
             }
-            finally
+            return true;
+        }
+    }
+
+    static StrFnOut ReadString(StrFnIn strFn) =>
+        (string input) =>
+        {
+            using (var handle = StringHandle.FromFunction(strFn, input))
             {
-                // Free the unmanaged memory allocated by the native function
-                if (outputPtr != IntPtr.Zero)
-                {
-                    // Marshal.FreeHGlobal(outputPtr);
-                    Marshal.FreeCoTaskMem(outputPtr);
-                }
+                return handle.AsString();
             }
         };
-    }
 
     // ffi function wrappers
-
-    public static string read(string input)
-    {
-        var fn = FFI.ReadString(RustNative.vrcrypt_lib.unsafe_read);
-        return fn(input);
-    }
 
     /// Create Random Meshes
 
     [System.Serializable]
-    public class CreateRandomMeshesInput
+    internal class CreateRandomMeshesInput
     {
         public List<XMesh> meshes;
         public float factor;
@@ -64,15 +82,10 @@ public class FFI
         }
     }
 
-    public static XMeshes CreateRandomMeshes(CreateRandomMeshesInput input)
+    internal static XMeshes CreateRandomMeshes(CreateRandomMeshesInput input)
     {
-        var json = JsonUtility.ToJson(input, true);
-        Debug.Log("Json: " + json);
-        var fn = FFI.ReadString(RustNative.vrcrypt_lib.unsafe_create_random_meshes);
-        var output = fn(json);
-        Debug.Log("output: " + output);
-        return XMeshes.FromJson(output);
+        string json = JsonUtility.ToJson(input, false);
+        StrFnOut fn = ReadString(RustNative.vrcrypt_lib.unsafe_create_random_meshes);
+        return XMeshes.FromJson(fn(json));
     }
-
-    internal class SubMeshDescriptor { }
 }
