@@ -2,9 +2,10 @@
 
 ## Prepare
 
-### Link Dlls
+- Unity Editor version: `2022.3.22f1`
+- In Unity: `Window` > `Package Manager` > `Add Package By Name`: `com.unity.formats.fbx`
 
-> Unity Editor 2022.3.22f1
+### Link Dlls
 
 - `ln -s <Unity Editor>\Data\Managed\UnityEditor.dll refs\UnityEditor.dll`
 - `ln -s <Unity Editor>\Data\Managed\UnityEngine.dll refs\UnityEngine.dll`
@@ -37,6 +38,7 @@
 
 ## TODOs
 
+- encrypt mesh instead of randomize
 - encrypt gameobjects
 - Process fbx & meshes in rust
   - https://github.com/I3ck/rust-3d
