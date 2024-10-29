@@ -11,7 +11,11 @@
 - `ln -s <Unity Editor>\Data\Managed\UnityEngine.dll refs\UnityEngine.dll`
 - `ln -s <Project>\Packages\com.vrchat.avatars\Runtime\VRCSDK\Plugins\VRCSDK3A.dll refs\VRCSDK3A.dll`
 - `ln -s <Project>\Packages\com.vrchat.base\Runtime\VRCSDK\Plugins\VRCSDKBase.dll refs\VRCSDKBase.dll`
-- `ln -s <Project>\Assets\RustNative\vrcrypt_lib\vrcrypt_lib.cs refs\vrcrypt_lib.cs`
+- `ln -s <Project>\Library\ScriptAssemblies\Unity.Formats.Fbx.Editor.dll refs\Unity.Formats.Fbx.Editor.dll`
+
+### Link FFI
+
+- Update reference to `vrcrypt_lib.cs` in VRCrypt.csproj
 
 ### Link Output Directory
 

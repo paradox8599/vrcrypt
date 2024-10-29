@@ -8,18 +8,31 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="UnityEditor">
-      <HintPath>refs/UnityEditor.dll</HintPath>
+    <Reference Include="VRCSDK3A">
+      <HintPath>refs\VRCSDK3A.dll</HintPath>
     </Reference>
+
+    <Reference Include="VRCSDKBase">
+      <HintPath>refs\VRCSDKBase.dll</HintPath>
+    </Reference>
+
+    <Reference Include="UnityEditor">
+      <HintPath>refs\UnityEditor.dll</HintPath>
+    </Reference>
+
     <Reference Include="UnityEngine">
       <HintPath>refs\UnityEngine.dll</HintPath>
     </Reference>
-    <Reference Include="VRCSDK3A">
-      <HintPath>refs/VRCSDK3A.dll</HintPath>
-     </Reference>
-    <Reference Include="VRCSDKBase">
-      <HintPath>refs/VRCSDKBase.dll</HintPath>
-     </Reference>
+
+    <Reference Include="UnityEditor.Formats.Fbx">
+      <HintPath>refs/Unity.Formats.Fbx.Editor.dll</HintPath>
+    </Reference>
+
+    <!-- <Reference Include="UnityEngine"> -->
+    <!--   <HintPath>refs\UnityEngine.dll</HintPath> -->
+    <!-- </Reference> -->
+
+
     <Compile Include="D:\Unity\Projects\mate\Assets\RustNative\vrcrypt_lib\vrcrypt_lib.cs" />
     <Compile Remove="lib\**\*.cs" />
   </ItemGroup>
