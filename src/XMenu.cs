@@ -1,13 +1,10 @@
-using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEditor;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 public class XMenu : EditorWindow
 {
     private XGameObject? avatar = null;
-    private bool ffi = true;
 
     [DebuggerHidden]
     [MenuItem("VRCrypt/Show")]
@@ -25,69 +22,12 @@ public class XMenu : EditorWindow
 
         AvatarInput();
 
-        if (avatar == null)
-            return;
-
-        ffi = EditorGUILayout.Toggle("Use FFI", ffi);
-
-        if (GUILayout.Button("ffi randomize"))
+        GUI.enabled = avatar != null;
+        if (GUILayout.Button("ffi randomize") && avatar != null)
         {
-            var allmeshes = avatar.GetAllMeshes();
-
-            var ffi_meshes = new List<XMesh>();
-            foreach (var x in allmeshes)
-            {
-                var m = new List<XMesh>();
-                m.Add(x);
-                var input = new FFI.CreateRandomMeshesInput(m, 0.01f);
-                var output = FFI.CreateRandomMeshes(input);
-                ffi_meshes.Add(output.meshes[0]);
-            }
-
-            var cs_meshes = avatar
-                .GetAllMeshes()
-                .ConvertAll(x => x.ToRandomized())
-                .ConvertAll(x => JsonUtility.ToJson(x))
-                .ConvertAll(x => JsonUtility.FromJson<XMesh>(x));
-
-            var meshes = ffi ? ffi_meshes : cs_meshes;
-
             var cloned = avatar.InMemoryClone();
-
-            foreach (var g in cloned.GetAllChildrenWithMeshes())
-            {
-                var xMesh = meshes.Find(x => x.path == g.path);
-                if (xMesh == null)
-                {
-                    Debug.LogError($"Mesh not found for: {g.path}");
-                }
-                xMesh!.SaveAsset();
-                var asset = xMesh!.LoadAsset();
-                if (asset == null)
-                {
-                    Debug.LogError($"Saved mesh assest not found: {g.path}");
-                }
-                g.ApplyMesh(asset!);
-            }
-            cloned.SavePrefab(avatar.prefabDir);
+            cloned.SaveRandomized(avatar.prefabDir);
         }
-
-        if (GUILayout.Button("compare"))
-        {
-            var x = new XGameObject(avatar.obj.transform.Find("Body").gameObject).xMesh;
-            var j1 = JsonUtility.ToJson(x);
-            var x2 = JsonUtility.FromJson<XMesh>(j1);
-
-            var m = x2.ToMesh();
-            var x3 = new XMesh(m);
-            x3.path = x!.path;
-            var j2 = JsonUtility.ToJson(x3);
-
-            Debug.Log(j1 == j2);
-            Debug.Log(Utils.CompareStrings(j1, j2));
-        }
-
-        // ReadPathsButton();
     }
 
     /// Avatar Input Box
@@ -114,23 +54,6 @@ public class XMenu : EditorWindow
                 "Please select an avatar prefab from Assets.",
                 MessageType.Warning
             );
-        }
-    }
-
-    /// Read Paths of all children with meshes of the avatar
-
-    void ReadPathsButton()
-    {
-        if (avatar == null)
-            return;
-        GUI.enabled = avatar.isPrefab;
-        if (GUILayout.Button("Read Paths"))
-        {
-            Debug.Log("paths");
-            foreach (var xgo in avatar.GetAllChildrenWithMeshes())
-            {
-                Debug.Log(xgo.path);
-            }
         }
     }
 }

@@ -114,4 +114,42 @@ public class XGameObject
         Debug.Log($"New prefab saved as {newPath}");
         return new XGameObject(prefab);
     }
+
+    public void SaveRandomized(string targetPrefabDir)
+    {
+        targetPrefabDir = Path.Combine(targetPrefabDir, "vrcrypted");
+        // Generate random meshes
+        var allmeshes = GetAllMeshes();
+        var xMeshes = new List<XMesh>();
+        foreach (var x in allmeshes)
+        {
+            var m = new List<XMesh>();
+            m.Add(x);
+            var input = new FFI.CreateRandomMeshesInput(m, 0.01f);
+            var output = FFI.CreateRandomMeshes(input);
+            xMeshes.Add(output.meshes[0]);
+        }
+
+        var meshDir = Path.Combine(targetPrefabDir, "meshes");
+
+        // replace meshes
+        foreach (var g in GetAllChildrenWithMeshes())
+        {
+            var xMesh = xMeshes.Find(x => x.path == g.path);
+            if (xMesh == null)
+            {
+                Debug.LogError($"Mesh not found for: {g.path}");
+            }
+            xMesh!.SaveAsset(meshDir);
+
+            var meshAsset = XMesh.LoadAsset(Path.Combine(meshDir, $"{xMesh.hash}.asset"));
+            if (meshAsset == null)
+            {
+                Debug.LogError($"Saved mesh assest not found: {g.path}");
+            }
+            g.ApplyMesh(meshAsset!);
+        }
+
+        SavePrefab(targetPrefabDir);
+    }
 }
