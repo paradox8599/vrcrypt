@@ -1,10 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
-using UnityEngine;
 
-internal class FFI
+internal partial class FFI
 {
     delegate IntPtr StrFnIn(ref sbyte input);
     delegate string StrFnOut(string input);
@@ -48,7 +46,7 @@ internal class FFI
                 unsafe
                 {
                     sbyte* ptrAsSByte = (sbyte*)handle.ToPointer();
-                    RustNative.vrcrypt_lib.unsafe_free_str(out *ptrAsSByte);
+                    RustNative.vrcrypt_lib.free_str(out *ptrAsSByte);
                     handle = IntPtr.Zero;
                 }
             }
@@ -61,31 +59,15 @@ internal class FFI
         {
             using (var handle = StringHandle.FromFunction(strFn, input))
             {
-                return handle.AsString();
+                var output = handle.AsString();
+                if (output.StartsWith("v"))
+                {
+                    return output.Substring(1);
+                }
+                else
+                {
+                    throw new Exception(output.Substring(1));
+                }
             }
         };
-
-    // ffi function wrappers
-
-    /// Create Random Meshes
-
-    [System.Serializable]
-    internal class CreateRandomMeshesInput
-    {
-        public List<XMesh> meshes;
-        public float factor;
-
-        public CreateRandomMeshesInput(List<XMesh> meshes, float factor)
-        {
-            this.meshes = meshes;
-            this.factor = factor;
-        }
-    }
-
-    internal static XMeshes CreateRandomMeshes(CreateRandomMeshesInput input)
-    {
-        string json = JsonUtility.ToJson(input, false);
-        StrFnOut fn = ReadString(RustNative.vrcrypt_lib.unsafe_create_random_meshes);
-        return XMeshes.FromJson(fn(json));
-    }
 }

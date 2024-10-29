@@ -1,6 +1,5 @@
-use crate::{build_inventory_with, cmd::unsafe_create_random_meshes, unsafe_free_str, unsafe_read};
-use interoptopus::{function, Inventory, InventoryBuilder};
+use crate::{cmd::ffi_create_random_meshes, utils::free_str};
 
-pub fn build_binding_inventory() -> Inventory {
-    build_inventory_with!(unsafe_free_str, unsafe_read, unsafe_create_random_meshes,)
+pub fn build_binding_inventory() -> interoptopus::Inventory {
+    crate::build_inventory_with!(free_str, ffi_create_random_meshes)
 }

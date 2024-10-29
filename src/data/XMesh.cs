@@ -7,23 +7,6 @@ using UnityEditor;
 using UnityEngine;
 
 [System.Serializable]
-public class XMeshes
-{
-    public List<XMesh> meshes;
-
-    public XMeshes(List<XMesh> meshes)
-    {
-        this.meshes = meshes;
-    }
-
-    public static XMeshes FromJson(string data) => JsonUtility.FromJson<XMeshes>(data);
-
-    public static string ToJson(List<XMesh> meshes) => new XMeshes(meshes).ToJson();
-
-    public string ToJson() => JsonUtility.ToJson(this);
-}
-
-[System.Serializable]
 public class XMesh
 {
     public static string savePath = "Assets/VRCrypt/data";

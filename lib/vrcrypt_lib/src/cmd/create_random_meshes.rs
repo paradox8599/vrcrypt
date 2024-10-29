@@ -1,19 +1,20 @@
-use crate::data::{XMesh, XMeshes};
-use serde::Deserialize;
-use unsafe_fn::unsafe_str;
+use crate::{data::XMesh, utils::FResult};
 
-#[derive(Deserialize)]
-struct CreateRandomMeshesInput {
+#[derive(serde::Deserialize)]
+struct Input {
     meshes: Vec<XMesh>,
     factor: f64,
 }
 
-#[unsafe_str]
-fn create_random_meshes(input: &str) -> String {
-    let save = || {
-        std::fs::write("Assets/VRCrypt/meshes.json", input);
-    };
-    let input = serde_json::from_str::<CreateRandomMeshesInput>(input).map_err(|e| e.to_string());
+#[derive(serde::Serialize)]
+struct Output {
+    meshes: Vec<XMesh>,
+}
+
+#[ffi_fn::ffi]
+fn create_random_meshes(input: &str) -> FResult {
+    let input = serde_json::from_str::<Input>(input);
+
     match input {
         Ok(input) => {
             let meshes = input
@@ -21,11 +22,11 @@ fn create_random_meshes(input: &str) -> String {
                 .iter()
                 .map(|m| m.randomized(input.factor))
                 .collect::<Vec<_>>();
-            XMeshes { meshes }.to_string()
+
+            Ok(serde_json::to_string(&Output { meshes })
+                .expect("create_random_meshes: ouptut serialization failed"))
         }
-        Err(e) => {
-            save();
-            return e;
-        }
+
+        Err(e) => Err(e.to_string()),
     }
 }
