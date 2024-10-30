@@ -3,6 +3,7 @@ use crate::{data::XMesh, utils::FResult};
 #[derive(serde::Deserialize)]
 struct Input {
     meshes: Vec<XMesh>,
+    key: String,
     factor: f64,
 }
 
@@ -12,7 +13,7 @@ struct Output {
 }
 
 #[ffi_fn::ffi]
-fn randomize(input: &str) -> FResult {
+fn decrypt_v1(input: &str) -> FResult {
     let input = serde_json::from_str::<Input>(input);
 
     match input {
@@ -20,11 +21,11 @@ fn randomize(input: &str) -> FResult {
             let meshes = input
                 .meshes
                 .iter()
-                .map(|m| m.randomized(input.factor))
+                .map(|m| m.decrypted_v1(&input.key, input.factor))
                 .collect::<Vec<_>>();
 
             Ok(serde_json::to_string(&Output { meshes })
-                .expect("randomize: ouptut serialization failed"))
+                .expect("decrypt: ouptut serialization failed"))
         }
 
         Err(e) => Err(e.to_string()),

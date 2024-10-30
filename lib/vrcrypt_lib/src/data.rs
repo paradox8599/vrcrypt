@@ -1,4 +1,6 @@
 use serde::{Deserialize, Serialize};
+use std::collections::hash_map::DefaultHasher;
+use std::hash::{Hash, Hasher};
 
 #[derive(Serialize, Deserialize, Debug, Default, Clone, Copy)]
 pub struct Vector2 {
@@ -151,6 +153,55 @@ impl XMesh {
                 x: v.x + (rand::random::<f64>() - 0.5) * factor,
                 y: v.y + (rand::random::<f64>() - 0.5) * factor,
                 z: v.z + (rand::random::<f64>() - 0.5) * factor,
+            };
+        }
+        mesh
+    }
+
+    pub fn encrypted_v1(&self, key: &str, factor: f64) -> XMesh {
+        let mut mesh = self.clone();
+
+        for (index, v) in mesh.vertices.iter_mut().enumerate() {
+            // Generate single hash
+            let hash_input = (key, index);
+            let mut hasher = DefaultHasher::new();
+            hash_input.hash(&mut hasher);
+            let hash = hasher.finish();
+
+            // Extract three different values from the single hash
+            let rand_x = ((hash & 0xFFFF) as f64) / 65535.0; // First 16 bits
+            let rand_y = (((hash >> 16) & 0xFFFF) as f64) / 65535.0; // Middle 16 bits
+            let rand_z = (((hash >> 32) & 0xFFFF) as f64) / 65535.0; // Last 16 bits
+
+            // Add offsets instead of scaling
+            *v = Vector3 {
+                x: v.x + (rand_x - 0.5) * factor,
+                y: v.y + (rand_y - 0.5) * factor,
+                z: v.z + (rand_z - 0.5) * factor,
+            };
+        }
+        mesh
+    }
+
+    pub fn decrypted_v1(&self, key: &str, factor: f64) -> XMesh {
+        let mut mesh = self.clone();
+        for (index, v) in mesh.vertices.iter_mut().enumerate() {
+            // Use identical hashing process
+            let hash_input = (key, index);
+            let mut hasher = DefaultHasher::new();
+            hash_input.hash(&mut hasher);
+            let hash = hasher.finish();
+
+            // Extract same three values
+            let rand_x = ((hash & 0xFFFF) as f64) / 65535.0;
+            let rand_y = (((hash >> 16) & 0xFFFF) as f64) / 65535.0;
+            let rand_z = (((hash >> 32) & 0xFFFF) as f64) / 65535.0;
+
+            // Subtract the same offsets to reverse
+            *v = Vector3 {
+                x: v.x - (rand_x - 0.5) * factor,
+                y: v.y - (rand_y - 0.5) * factor,
+                z: v.z - (rand_z - 0.5) * factor,
             };
         }
         mesh

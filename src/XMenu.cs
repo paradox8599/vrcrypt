@@ -5,6 +5,8 @@ using UnityEngine;
 public class XMenu : EditorWindow
 {
     private XGameObject? avatar = null;
+    private string key = "";
+    private float factor = 0.1f;
 
     [DebuggerHidden]
     [MenuItem("VRCrypt/Show")]
@@ -18,16 +20,28 @@ public class XMenu : EditorWindow
 
     void OnGUI()
     {
+        factor = 0.01f;
         GUILayout.Label("VRCrypt", EditorStyles.boldLabel);
 
         AvatarInput();
 
+        key = GUILayout.TextField(key, 100, EditorStyles.textField);
+
         GUI.enabled = avatar != null;
-        if (GUILayout.Button("ffi randomize") && avatar != null)
+
+        GUILayout.BeginHorizontal();
+        if (GUILayout.Button("ffi encrypt") && avatar != null)
         {
             var cloned = avatar.InMemoryClone();
-            cloned.SaveRandomized(avatar.prefabDir);
+            cloned.SaveEncrypted(avatar.prefabDir, key, factor);
         }
+
+        if (GUILayout.Button("ffi decrypted") && avatar != null)
+        {
+            var cloned = avatar.InMemoryClone();
+            cloned.decrypt(key, factor);
+        }
+        GUILayout.EndHorizontal();
     }
 
     /// Avatar Input Box

@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <Nullable>enable</Nullable>
@@ -24,8 +23,11 @@
       <HintPath>refs\UnityEngine.dll</HintPath>
     </Reference>
 
+    <!-- Release Ref -->
+    <!-- <Compile Include="lib\vrcrypt_lib\bindings\csharp\vrcrypt_lib.cs" /> -->
+
+    <!-- Debug Ref -->
     <Compile Include="D:\Unity\Projects\mate\Assets\RustNative\vrcrypt_lib\vrcrypt_lib.cs" />
     <Compile Remove="lib\**\*.cs" />
   </ItemGroup>
-
 </Project>

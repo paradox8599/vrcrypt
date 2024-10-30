@@ -22,27 +22,22 @@
 - `mkdir -p <Project>\Assets/VRCrypt`
 - `ln -s <Project>\Assets\VRCrypt out`
 
-## Build
+## Debug Build
 
 - `dotnet build`
 
 ### Build & Replace
 
-- `build.bat`
+- `b.bat`
 
 > A rebuild is required after each rust build
 
-## Logics
+## Release build
 
-- Encryption
-  - Read avatar from a prefab (in memory)
-  - Read all gameobjects with meshes, record their path (save to Dict) (in memory)
-  - Read all meshes, record their path (save to Dict) (in memory)
-- Decryption
+- change lib reference in csproj
 
 ## TODOs
 
-- encrypt mesh instead of randomize
 - encrypt gameobjects
 - Process fbx & meshes in rust
   - https://github.com/I3ck/rust-3d
