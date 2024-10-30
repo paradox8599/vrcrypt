@@ -3,7 +3,6 @@
 ## Prepare
 
 - Unity Editor version: `2022.3.22f1`
-- In Unity: `Window` > `Package Manager` > `Add Package By Name`: `com.unity.formats.fbx`
 
 ### Link Dlls
 
@@ -11,7 +10,8 @@
 - `ln -s <Unity Editor>\Data\Managed\UnityEngine.dll refs\UnityEngine.dll`
 - `ln -s <Project>\Packages\com.vrchat.avatars\Runtime\VRCSDK\Plugins\VRCSDK3A.dll refs\VRCSDK3A.dll`
 - `ln -s <Project>\Packages\com.vrchat.base\Runtime\VRCSDK\Plugins\VRCSDKBase.dll refs\VRCSDKBase.dll`
-- `ln -s <Project>\Library\ScriptAssemblies\Unity.Formats.Fbx.Editor.dll refs\Unity.Formats.Fbx.Editor.dll`
+
+> Or just do `sh link.sh`
 
 ### Link FFI
 
