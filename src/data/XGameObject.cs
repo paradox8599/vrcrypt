@@ -125,7 +125,7 @@ public class XGameObject
         {
             var m = new List<XMesh>();
             m.Add(x);
-            var input = new FFI.CreateRandomMeshesInput(m, 0.01f);
+            var input = new FFI.MeshRandomizeInput(m, 0.01f);
             var output = FFI.CreateRandomMeshes(input);
             xMeshes.Add(output.meshes[0]);
         }

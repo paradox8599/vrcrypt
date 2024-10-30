@@ -12,7 +12,7 @@ struct Output {
 }
 
 #[ffi_fn::ffi]
-fn create_random_meshes(input: &str) -> FResult {
+fn randomize(input: &str) -> FResult {
     let input = serde_json::from_str::<Input>(input);
 
     match input {
