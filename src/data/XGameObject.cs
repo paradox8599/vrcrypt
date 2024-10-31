@@ -93,7 +93,7 @@ public class XGameObject
     [DebuggerHidden]
     public XGameObject InMemoryClone(bool hide = false)
     {
-        var memoryCopy = Object.Instantiate(obj.gameObject);
+        var memoryCopy = UnityEngine.Object.Instantiate(obj.gameObject);
         if (hide)
         {
             memoryCopy.hideFlags = HideFlags.HideInHierarchy;
@@ -167,7 +167,7 @@ public class XGameObject
     }
 
     [DebuggerHidden]
-    public void SaveEncrypted(string targetPrefabDir, string key, float factor = 0.1f)
+    public void EncryptMeshesAndSave(string targetPrefabDir, string key, float factor = 0.1f)
     {
         targetPrefabDir = Path.Combine(targetPrefabDir, "vrcrypt_encrypted");
         // Generate random meshes
@@ -205,7 +205,7 @@ public class XGameObject
     }
 
     [DebuggerHidden]
-    public void decrypt(string key, float factor = 0.1f)
+    public void decryptMeshes(string key, float factor = 0.1f)
     {
         // Generate random meshes
         var allmeshes = GetAllMeshes();

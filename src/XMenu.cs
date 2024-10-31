@@ -1,6 +1,9 @@
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEditor;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 public class XMenu : EditorWindow
 {
@@ -33,13 +36,13 @@ public class XMenu : EditorWindow
         if (GUILayout.Button("ffi encrypt") && avatar != null)
         {
             var cloned = avatar.InMemoryClone();
-            cloned.SaveEncrypted(avatar.prefabDir, key, factor);
+            cloned.EncryptMeshesAndSave(avatar.prefabDir, key, factor);
         }
 
         if (GUILayout.Button("ffi decrypted") && avatar != null)
         {
             var cloned = avatar.InMemoryClone();
-            cloned.decrypt(key, factor);
+            cloned.decryptMeshes(key, factor);
         }
         GUILayout.EndHorizontal();
     }
@@ -70,5 +73,56 @@ public class XMenu : EditorWindow
                 MessageType.Warning
             );
         }
+    }
+
+    [Serializable]
+    public class ComponentData
+    {
+        public string? typeFullName;
+        public string? jsonData;
+    }
+
+    [Serializable]
+    public class GameObjectData
+    {
+        public string? name;
+        public List<ComponentData> components = new List<ComponentData>();
+    }
+
+    public string SerializeToFile(GameObject gameObject)
+    {
+        GameObjectData data = new GameObjectData();
+        data.name = gameObject.name;
+
+        Component[] components = gameObject.GetComponents<Component>();
+        foreach (var component in components)
+        {
+            ComponentData componentData = new ComponentData
+            {
+                typeFullName = component.GetType().AssemblyQualifiedName,
+                jsonData = EditorJsonUtility.ToJson(component),
+            };
+            data.components.Add(componentData);
+        }
+        string jsonString = JsonUtility.ToJson(data, false); // true for pretty print
+        return jsonString;
+    }
+
+    public GameObject Deserialize(string json)
+    {
+        GameObjectData data = JsonUtility.FromJson<GameObjectData>(json);
+        GameObject newGameObject = new GameObject(data.name);
+        foreach (var componentData in data.components)
+        {
+            Type componentType = Type.GetType(componentData.typeFullName);
+            if (componentType == null)
+            {
+                Debug.LogError($"Could not find type: {componentData.typeFullName}");
+                continue;
+            }
+            Component newComponent = newGameObject.AddComponent(componentType);
+            EditorJsonUtility.FromJsonOverwrite(componentData.jsonData, newComponent);
+        }
+        return newGameObject;
     }
 }
