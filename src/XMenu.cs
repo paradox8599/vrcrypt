@@ -6,7 +6,6 @@ public class XMenu : EditorWindow
 {
     private XGameObject? avatar = null;
     private string key = "";
-    private float factor = 0.1f;
 
     [DebuggerHidden]
     [MenuItem("VRCrypt/Show")]
@@ -18,14 +17,15 @@ public class XMenu : EditorWindow
 
     // On GUI
 
+    [DebuggerHidden]
     void OnGUI()
     {
-        factor = 0.01f;
+        var factor = 0.01f;
         GUILayout.Label("VRCrypt", EditorStyles.boldLabel);
 
         AvatarInput();
 
-        key = GUILayout.TextField(key, 100, EditorStyles.textField);
+        key = GUILayout.TextField(key, 100);
 
         GUI.enabled = avatar != null;
 
@@ -46,6 +46,7 @@ public class XMenu : EditorWindow
 
     /// Avatar Input Box
 
+    [DebuggerHidden]
     void AvatarInput()
     {
         var ago =

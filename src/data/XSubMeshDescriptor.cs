@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -14,6 +15,7 @@ public class XSubMeshDescriptor
     public int firstVertex;
     public int vertexCount;
 
+    [DebuggerHidden]
     public XSubMeshDescriptor(SubMeshDescriptor data)
     {
         bounds = new XBounds(data.bounds);
@@ -25,6 +27,7 @@ public class XSubMeshDescriptor
         vertexCount = data.vertexCount;
     }
 
+    [DebuggerHidden]
     public SubMeshDescriptor ToSubMeshDescriptor()
     {
         return new SubMeshDescriptor

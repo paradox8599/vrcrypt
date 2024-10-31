@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -14,6 +15,7 @@ internal partial class FFI
 
         public override bool IsInvalid => handle == IntPtr.Zero;
 
+        [DebuggerHidden]
         public static StringHandle FromFunction(StrFnIn ffiFunction, string input)
         {
             byte[] inputBytes = Encoding.UTF8.GetBytes(input + "\0");
@@ -27,6 +29,7 @@ internal partial class FFI
             }
         }
 
+        [DebuggerHidden]
         public string AsString()
         {
             int len = 0;
@@ -39,6 +42,7 @@ internal partial class FFI
             return Encoding.UTF8.GetString(buffer);
         }
 
+        [DebuggerHidden]
         protected override bool ReleaseHandle()
         {
             if (!IsInvalid)
@@ -54,6 +58,7 @@ internal partial class FFI
         }
     }
 
+    [DebuggerHidden]
     static StrFnOut ReadString(StrFnIn strFn) =>
         (string input) =>
         {

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 
 internal partial class FFI
@@ -12,6 +13,7 @@ internal partial class FFI
             public string key;
             public float factor;
 
+            [DebuggerHidden]
             public EncryptInput(List<XMesh> meshes, string key, float factor)
             {
                 this.meshes = meshes;
@@ -25,12 +27,14 @@ internal partial class FFI
         {
             public List<XMesh> meshes;
 
+            [DebuggerHidden]
             EncryptOutput(List<XMesh> meshes)
             {
                 this.meshes = meshes;
             }
         }
 
+        [DebuggerHidden]
         internal static EncryptOutput Encrypt(List<XMesh> meshes, string key, float factor)
         {
             var input = new EncryptInput(meshes, key, factor);

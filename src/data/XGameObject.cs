@@ -1,10 +1,13 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 public class XGameObject
 {
+    [DebuggerHidden]
     public static bool IsPrefab(GameObject obj) =>
         PrefabUtility.GetPrefabAssetType(obj) != PrefabAssetType.NotAPrefab;
 
@@ -30,11 +33,13 @@ public class XGameObject
         }
     }
 
+    [DebuggerHidden]
     public XGameObject(GameObject obj)
     {
         this.obj = obj;
     }
 
+    [DebuggerHidden]
     public static XGameObject? New(GameObject? obj)
     {
         return obj == null ? null : new XGameObject(obj);
@@ -57,6 +62,7 @@ public class XGameObject
         }
     }
 
+    [DebuggerHidden]
     public List<XGameObject> GetAllChildren(Transform? root = null)
     {
         root ??= obj.transform;
@@ -69,11 +75,15 @@ public class XGameObject
         return children;
     }
 
+    [DebuggerHidden]
     public List<XGameObject> GetAllChildrenWithMeshes() =>
         GetAllChildren().FindAll(x => x.xMesh != null);
 
+
+    [DebuggerHidden]
     public List<XMesh> GetAllMeshes() => GetAllChildrenWithMeshes().ConvertAll(x => x.xMesh!)!;
 
+    [DebuggerHidden]
     public Mesh? ApplyMesh(Mesh mesh) =>
         smr != null ? (smr.sharedMesh = mesh)
         : mf != null ? (mf.sharedMesh = mesh)
@@ -81,6 +91,7 @@ public class XGameObject
 
     public bool isPrefab => XGameObject.IsPrefab(this.obj);
 
+    [DebuggerHidden]
     public XGameObject InMemoryClone()
     {
         var memoryCopy = Object.Instantiate(obj.gameObject);
@@ -93,17 +104,17 @@ public class XGameObject
 
     // With Side Effects
 
+    [DebuggerHidden]
     public XGameObject? SavePrefab(string dir, string suffix = "vrcrypted")
     {
-        string newName = $"{obj.name}_{suffix}.prefab";
-        string newPath = Path.Combine(dir, newName);
+        obj.name = $"{obj.name}_{suffix}";
+        string newPath = Path.Combine(dir, $"{obj.name}.prefab");
         GameObject? prefab = PrefabUtility.SaveAsPrefabAsset(obj, newPath);
         if (prefab == null)
         {
             Debug.LogError("Failed to save prefab");
             return null;
         }
-
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
 
@@ -115,6 +126,7 @@ public class XGameObject
         return new XGameObject(prefab);
     }
 
+    [DebuggerHidden]
     public void SaveRandomized(string targetPrefabDir)
     {
         targetPrefabDir = Path.Combine(targetPrefabDir, "vrcrypted");
@@ -152,6 +164,7 @@ public class XGameObject
         SavePrefab(targetPrefabDir);
     }
 
+    [DebuggerHidden]
     public void SaveEncrypted(string targetPrefabDir, string key, float factor = 0.1f)
     {
         targetPrefabDir = Path.Combine(targetPrefabDir, "vrcrypt_encrypted");
@@ -189,6 +202,7 @@ public class XGameObject
         SavePrefab(targetPrefabDir);
     }
 
+    [DebuggerHidden]
     public void decrypt(string key, float factor = 0.1f)
     {
         // Generate random meshes

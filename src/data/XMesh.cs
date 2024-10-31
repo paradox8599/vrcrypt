@@ -9,6 +9,7 @@ using UnityEngine;
 [System.Serializable]
 public class XMesh
 {
+    [DebuggerHidden]
     public static Mesh? LoadAsset(string path) => AssetDatabase.LoadAssetAtPath<Mesh>(path);
 
     private string? _hash = null;
@@ -39,6 +40,7 @@ public class XMesh
 
     // Constructor & Deserialzions
 
+    [DebuggerHidden]
     public XMesh(Mesh mesh)
     {
         path = string.Empty;
@@ -80,6 +82,7 @@ public class XMesh
 
     // Serialize
 
+    [DebuggerHidden]
     public Mesh ToMesh()
     {
         Mesh mesh = new Mesh();
@@ -138,6 +141,7 @@ public class XMesh
 
     // Side Effects
 
+    [DebuggerHidden]
     public void SaveAsset(string? altSavePath = "Assets/VRCrypt/data")
     {
         if (!Directory.Exists(altSavePath))

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using UnityEngine;
 
 [System.Serializable]
@@ -8,6 +9,7 @@ public class XColor
   public float b;
   public float a;
 
+  [DebuggerHidden]
   public XColor(Color color)
   {
     r = color.r;
@@ -16,11 +18,13 @@ public class XColor
     a = color.a;
   }
 
+  [DebuggerHidden]
   public Color ToColor()
   {
     return new Color(r, g, b, a);
   }
 
+  [DebuggerHidden]
   public static XColor[] FromColors(Color[] colors)
   {
     var xColors = new XColor[colors.Length];
@@ -31,6 +35,7 @@ public class XColor
     return xColors;
   }
 
+  [DebuggerHidden]
   public static Color[] ToColors(XColor[] xColors)
   {
     var colors = new Color[xColors.Length];

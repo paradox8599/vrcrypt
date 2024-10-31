@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using UnityEngine;
 
 [Serializable]
@@ -7,6 +8,7 @@ public class XBlendShape
     public string name;
     public XBlendShapeFrame[] frames;
 
+    [DebuggerHidden]
     public XBlendShape(Mesh mesh, int blendShapeIndex)
     {
         name = mesh.GetBlendShapeName(blendShapeIndex);
@@ -19,6 +21,7 @@ public class XBlendShape
         }
     }
 
+    [DebuggerHidden]
     public void ApplyToMesh(Mesh mesh)
     {
         for (int i = 0; i < frames.Length; i++)
@@ -42,6 +45,7 @@ public class XBlendShapeFrame
     public Vector3[] deltaNormals;
     public Vector3[] deltaTangents;
 
+    [DebuggerHidden]
     public XBlendShapeFrame(Mesh mesh, int blendShapeIndex, int frameIndex)
     {
         weight = mesh.GetBlendShapeFrameWeight(blendShapeIndex, frameIndex);
