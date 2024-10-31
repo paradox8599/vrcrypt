@@ -1,26 +1,16 @@
 # VRCrypt
 
-## Prepare
+## Prerequisites
 
 - Unity Editor version: `2022.3.22f1`
 
-### Link Dlls
+### Link Dlls & Output Directory
 
-- `ln -s <Unity Editor>\Data\Managed\UnityEditor.dll refs\UnityEditor.dll`
-- `ln -s <Unity Editor>\Data\Managed\UnityEngine.dll refs\UnityEngine.dll`
-- `ln -s <Project>\Packages\com.vrchat.avatars\Runtime\VRCSDK\Plugins\VRCSDK3A.dll refs\VRCSDK3A.dll`
-- `ln -s <Project>\Packages\com.vrchat.base\Runtime\VRCSDK\Plugins\VRCSDKBase.dll refs\VRCSDKBase.dll`
-
-> Or just do `sh link.sh`
+`sh link.sh`
 
 ### Link FFI
 
 - Update reference to `vrcrypt_lib.cs` in VRCrypt.csproj
-
-### Link Output Directory
-
-- `mkdir -p <Project>\Assets/VRCrypt`
-- `ln -s <Project>\Assets\VRCrypt out`
 
 ## Debug Build
 
