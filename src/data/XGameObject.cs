@@ -79,7 +79,6 @@ public class XGameObject
     public List<XGameObject> GetAllChildrenWithMeshes() =>
         GetAllChildren().FindAll(x => x.xMesh != null);
 
-
     [DebuggerHidden]
     public List<XMesh> GetAllMeshes() => GetAllChildrenWithMeshes().ConvertAll(x => x.xMesh!)!;
 
@@ -92,11 +91,14 @@ public class XGameObject
     public bool isPrefab => XGameObject.IsPrefab(this.obj);
 
     [DebuggerHidden]
-    public XGameObject InMemoryClone()
+    public XGameObject InMemoryClone(bool hide = false)
     {
         var memoryCopy = Object.Instantiate(obj.gameObject);
-        // memoryCopy.hideFlags = HideFlags.HideInHierarchy;
-        // memoryCopy.SetActive(false);
+        if (hide)
+        {
+            memoryCopy.hideFlags = HideFlags.HideInHierarchy;
+            memoryCopy.SetActive(false);
+        }
         memoryCopy.name = obj.name;
         memoryCopy.transform.SetParent(null, false);
         return new XGameObject(memoryCopy);
@@ -105,9 +107,9 @@ public class XGameObject
     // With Side Effects
 
     [DebuggerHidden]
-    public XGameObject? SavePrefab(string dir, string suffix = "vrcrypted")
+    public XGameObject? SavePrefab(string dir, string suffix = "_vrcrypted")
     {
-        obj.name = $"{obj.name}_{suffix}";
+        obj.name = $"{obj.name}{suffix}";
         string newPath = Path.Combine(dir, $"{obj.name}.prefab");
         GameObject? prefab = PrefabUtility.SaveAsPrefabAsset(obj, newPath);
         if (prefab == null)
