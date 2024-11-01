@@ -28,6 +28,6 @@
 
     <!-- Debug Ref -->
     <Compile Include="D:\Unity\Projects\mate\Assets\RustNative\vrcrypt_lib\vrcrypt_lib.cs" />
-    <Compile Remove="lib\**\*.cs" />
+    <Compile Remove="libs\**\*.cs" />
   </ItemGroup>
 </Project>
