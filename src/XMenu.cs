@@ -10,6 +10,8 @@ public class XMenu : EditorWindow
     private XGameObject? avatar = null;
     private string key = "";
 
+    XAvatar? xa;
+
     [DebuggerHidden]
     [MenuItem("VRCrypt/Show")]
     private static void ShowMenu()
@@ -43,6 +45,20 @@ public class XMenu : EditorWindow
         {
             var cloned = avatar.InMemoryClone();
             cloned.decryptMeshes(key, factor);
+        }
+        GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal();
+        if (GUILayout.Button("read Avatar"))
+        {
+            xa = XAvatar.FromGameObject(avatar!.obj);
+            Debug.Log(xa!.json);
+        }
+
+        if (GUILayout.Button("restore Avatar"))
+        {
+            var ani = avatar!.obj.GetComponent<Animator>();
+            xa!.Restore(ani.avatar);
         }
         GUILayout.EndHorizontal();
     }
