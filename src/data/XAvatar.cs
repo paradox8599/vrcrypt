@@ -1,6 +1,7 @@
 using System;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 [Serializable]
 internal class XAvatar
@@ -34,5 +35,38 @@ internal class XAvatar
     {
         EditorJsonUtility.FromJsonOverwrite(json, avatar);
         avatar.name = name;
+    }
+
+    internal static void Save(Avatar avatar, string savePath)
+    {
+        if (!savePath.EndsWith(".asset"))
+        {
+            savePath += ".asset";
+        }
+
+        string directory = System.IO.Path.GetDirectoryName(savePath);
+
+        if (!System.IO.Directory.Exists(directory))
+        {
+            System.IO.Directory.CreateDirectory(directory);
+        }
+
+        Debug.Log("Saving Avatar: " + savePath);
+
+        var newAvatar = Object.Instantiate(avatar);
+        AssetDatabase.CreateAsset(newAvatar, savePath);
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+    }
+
+    internal static Avatar? Read(string path)
+    {
+        if (!System.IO.File.Exists(path))
+        {
+            return null;
+        }
+
+        var asset = AssetDatabase.LoadAssetAtPath<Avatar>(path);
+        return asset;
     }
 }

@@ -10,8 +10,6 @@ public class XMenu : EditorWindow
     private XGameObject? avatar = null;
     private string key = "";
 
-    XAvatar? xa;
-
     [DebuggerHidden]
     [MenuItem("VRCrypt/Show")]
     private static void ShowMenu()
@@ -25,7 +23,6 @@ public class XMenu : EditorWindow
     [DebuggerHidden]
     void OnGUI()
     {
-        var factor = 0.01f;
         GUILayout.Label("VRCrypt", EditorStyles.boldLabel);
 
         AvatarInput();
@@ -35,6 +32,7 @@ public class XMenu : EditorWindow
         GUI.enabled = avatar != null;
 
         GUILayout.BeginHorizontal();
+        var factor = 0.01f;
         if (GUILayout.Button("ffi encrypt") && avatar != null)
         {
             var cloned = avatar.InMemoryClone();
@@ -49,16 +47,24 @@ public class XMenu : EditorWindow
         GUILayout.EndHorizontal();
 
         GUILayout.BeginHorizontal();
-        if (GUILayout.Button("read Avatar"))
+        if (GUILayout.Button("Save Avatar"))
         {
-            xa = XAvatar.FromGameObject(avatar!.obj);
-            Debug.Log(xa!.json);
+            var animator = avatar!.obj.GetComponent<Animator>();
+            XAvatar.Save(animator.avatar, "Assets/avatar.asset");
         }
 
         if (GUILayout.Button("restore Avatar"))
         {
-            var ani = avatar!.obj.GetComponent<Animator>();
-            xa!.Restore(ani.avatar);
+            var ava = XAvatar.Read("Assets/avatar.asset");
+            if (ava == null)
+            {
+                Debug.Log("avatar is null");
+            }
+            else
+            {
+                var animator = avatar!.obj.GetComponent<Animator>();
+                animator.avatar = ava;
+            }
         }
         GUILayout.EndHorizontal();
     }
