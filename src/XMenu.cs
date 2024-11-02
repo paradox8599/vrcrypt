@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEditor;
 using UnityEngine;
@@ -23,28 +21,42 @@ public class XMenu : EditorWindow
     [DebuggerHidden]
     void OnGUI()
     {
-        GUILayout.Label("VRCrypt", EditorStyles.boldLabel);
-
         AvatarInput();
 
         key = GUILayout.TextField(key, 100);
 
         GUI.enabled = avatar != null;
 
+        // encryption
+
+        if (GUILayout.Button("List Mesh paths"))
+        {
+            foreach (var xg in avatar!.GetAllChildrenWithMeshes())
+            {
+                if (xg.mesh != null)
+                {
+                    Debug.Log($"is fbx: {XMesh.IsFbx(xg.mesh)}");
+                }
+            }
+        }
+
         GUILayout.BeginHorizontal();
         var factor = 0.01f;
         if (GUILayout.Button("ffi encrypt") && avatar != null)
         {
             var cloned = avatar.InMemoryClone();
-            cloned.EncryptMeshesAndSave(avatar.prefabDir, key, factor);
+            cloned.EncryptMeshesAndSave("Assets/Mamehinata/vrcrypt", key, factor);
+            cloned.SavePrefab("Assets/Mamehinata/vrcrypt");
         }
 
         if (GUILayout.Button("ffi decrypted") && avatar != null)
         {
             var cloned = avatar.InMemoryClone();
-            cloned.decryptMeshes(key, factor);
+            cloned.DecryptAndApply(key, factor);
         }
         GUILayout.EndHorizontal();
+
+        // avatar
 
         GUILayout.BeginHorizontal();
         if (GUILayout.Button("Save Avatar"))
@@ -95,56 +107,5 @@ public class XMenu : EditorWindow
                 MessageType.Warning
             );
         }
-    }
-
-    [Serializable]
-    public class ComponentData
-    {
-        public string? typeFullName;
-        public string? jsonData;
-    }
-
-    [Serializable]
-    public class GameObjectData
-    {
-        public string? name;
-        public List<ComponentData> components = new List<ComponentData>();
-    }
-
-    public string SerializeToFile(GameObject gameObject)
-    {
-        GameObjectData data = new GameObjectData();
-        data.name = gameObject.name;
-
-        Component[] components = gameObject.GetComponents<Component>();
-        foreach (var component in components)
-        {
-            ComponentData componentData = new ComponentData
-            {
-                typeFullName = component.GetType().AssemblyQualifiedName,
-                jsonData = EditorJsonUtility.ToJson(component),
-            };
-            data.components.Add(componentData);
-        }
-        string jsonString = JsonUtility.ToJson(data, false); // true for pretty print
-        return jsonString;
-    }
-
-    public GameObject Deserialize(string json)
-    {
-        GameObjectData data = JsonUtility.FromJson<GameObjectData>(json);
-        GameObject newGameObject = new GameObject(data.name);
-        foreach (var componentData in data.components)
-        {
-            Type componentType = Type.GetType(componentData.typeFullName);
-            if (componentType == null)
-            {
-                Debug.LogError($"Could not find type: {componentData.typeFullName}");
-                continue;
-            }
-            Component newComponent = newGameObject.AddComponent(componentType);
-            EditorJsonUtility.FromJsonOverwrite(componentData.jsonData, newComponent);
-        }
-        return newGameObject;
     }
 }

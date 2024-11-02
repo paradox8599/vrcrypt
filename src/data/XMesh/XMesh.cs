@@ -42,4 +42,7 @@ public partial class XMesh
 
     [DebuggerHidden]
     public static Mesh? LoadAsset(string path) => AssetDatabase.LoadAssetAtPath<Mesh>(path);
+
+    public static bool? IsFbx(Mesh mesh) =>
+        AssetDatabase.GetAssetPath(mesh)?.EndsWith(".fbx") ?? false;
 }

@@ -4,9 +4,9 @@ using UnityEngine;
 public partial class XMesh
 {
   [DebuggerHidden]
-  public XMesh(Mesh mesh)
+  public XMesh(Mesh mesh, string? path)
   {
-    path = string.Empty;
+    this.path = path ?? string.Empty;
     name = mesh.name;
     vertices = mesh.vertices;
     triangles = mesh.triangles;
