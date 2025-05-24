@@ -1,13 +1,14 @@
 using System.Diagnostics;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 public class XMenu : EditorWindow
 {
     private XGameObject? avatar = null;
     private string key = "";
 
+    // Menu
     [DebuggerHidden]
     [MenuItem("VRCrypt/Show")]
     private static void ShowMenu()
@@ -23,62 +24,34 @@ public class XMenu : EditorWindow
     {
         AvatarInput();
 
-        key = GUILayout.TextField(key, 100);
+        key = GUILayout.TextField(key, 32);
 
         GUI.enabled = avatar != null;
 
-        // encryption
-
-        if (GUILayout.Button("List Mesh paths"))
+        if (GUILayout.Button("Encrypt"))
         {
-            foreach (var xg in avatar!.GetAllChildrenWithMeshes())
+            string exportPath = "Assets/vrcrypted";
+            var cloned = avatar!.InMemoryClone();
+            var encryptedMeshes = FFI.Meshes.Encrypt(cloned.GetAllMeshes(), key, 0.01f).meshes;
+
+            // save avatar as asset
+            var animator = cloned.obj.GetComponent<Animator>();
+            var savedAvatar = XAvatar.Save(animator.avatar, exportPath);
+            animator.avatar = savedAvatar;
+
+            // save meshes as asset
+            var meshPath = Path.Combine(exportPath, "meshes");
+
+            // assign encrypted meshes to clone
+            foreach (var xgo in cloned.GetAllChildrenWithMeshes())
             {
-                if (xg.mesh != null)
-                {
-                    Debug.Log($"is fbx: {XMesh.IsFbx(xg.mesh)}");
-                }
+                var xMesh = encryptedMeshes.Find(x => x.path == xgo.path);
+                var mesh = xMesh.SaveAsset(meshPath);
+                xgo.ApplyMesh(mesh);
             }
-        }
 
-        GUILayout.BeginHorizontal();
-        var factor = 0.01f;
-        if (GUILayout.Button("ffi encrypt") && avatar != null)
-        {
-            var cloned = avatar.InMemoryClone();
-            cloned.EncryptMeshesAndSave("Assets/Mamehinata/vrcrypt", key, factor);
-            cloned.SavePrefab("Assets/Mamehinata/vrcrypt");
+            cloned.SavePrefab(exportPath);
         }
-
-        if (GUILayout.Button("ffi decrypted") && avatar != null)
-        {
-            var cloned = avatar.InMemoryClone();
-            cloned.DecryptAndApply(key, factor);
-        }
-        GUILayout.EndHorizontal();
-
-        // avatar
-
-        GUILayout.BeginHorizontal();
-        if (GUILayout.Button("Save Avatar"))
-        {
-            var animator = avatar!.obj.GetComponent<Animator>();
-            XAvatar.Save(animator.avatar, "Assets/avatar.asset");
-        }
-
-        if (GUILayout.Button("restore Avatar"))
-        {
-            var ava = XAvatar.Read("Assets/avatar.asset");
-            if (ava == null)
-            {
-                Debug.Log("avatar is null");
-            }
-            else
-            {
-                var animator = avatar!.obj.GetComponent<Animator>();
-                animator.avatar = ava;
-            }
-        }
-        GUILayout.EndHorizontal();
     }
 
     /// Avatar Input Box

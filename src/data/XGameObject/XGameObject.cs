@@ -74,9 +74,8 @@ public partial class XGameObject
     }
 
     [DebuggerHidden]
-    public XGameObject? SavePrefab(string dir, string suffix = "_vrcrypted")
+    public XGameObject? SavePrefab(string dir)
     {
-        obj.name = $"{obj.name}{suffix}";
         string newPath = Path.Combine(dir, $"{obj.name}.prefab");
         GameObject? prefab = PrefabUtility.SaveAsPrefabAsset(obj, newPath);
         if (prefab == null)

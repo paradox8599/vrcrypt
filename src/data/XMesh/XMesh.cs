@@ -27,7 +27,7 @@ public partial class XMesh
     public Vector2[] uv8;
 
     [DebuggerHidden]
-    public void SaveAsset(string? path = "Assets/VRCrypt/data")
+    public Mesh SaveAsset(string? path = "Assets/VRCrypt/data")
     {
         if (!Directory.Exists(path))
         {
@@ -35,9 +35,11 @@ public partial class XMesh
         }
 
         path = Path.Combine(path, $"{hash}.asset");
-        AssetDatabase.CreateAsset(ToMesh(), path);
+        var mesh = ToMesh();
+        AssetDatabase.CreateAsset(mesh, path);
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
+        return mesh;
     }
 
     [DebuggerHidden]

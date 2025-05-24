@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -21,14 +22,14 @@ internal class XAvatar
         name = animator.avatar.name;
     }
 
-    internal static XAvatar? FromGameObject(GameObject gameObject)
+    internal static Avatar? FromGameObject(GameObject gameObject)
     {
         var animator = gameObject.GetComponent<Animator>();
         if (animator == null)
         {
             return null;
         }
-        return new XAvatar(animator.avatar);
+        return animator.avatar;
     }
 
     internal void Restore(Avatar avatar)
@@ -37,26 +38,20 @@ internal class XAvatar
         avatar.name = name;
     }
 
-    internal static void Save(Avatar avatar, string savePath)
+    internal static Avatar Save(Avatar avatar, string savePath)
     {
-        if (!savePath.EndsWith(".asset"))
+        if (!System.IO.Directory.Exists(savePath))
         {
-            savePath += ".asset";
-        }
-
-        string directory = System.IO.Path.GetDirectoryName(savePath);
-
-        if (!System.IO.Directory.Exists(directory))
-        {
-            System.IO.Directory.CreateDirectory(directory);
+            System.IO.Directory.CreateDirectory(savePath);
         }
 
         Debug.Log("Saving Avatar: " + savePath);
 
         var newAvatar = Object.Instantiate(avatar);
-        AssetDatabase.CreateAsset(newAvatar, savePath);
+        AssetDatabase.CreateAsset(newAvatar, Path.Combine(savePath, $"{avatar.name}.asset"));
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
+        return newAvatar;
     }
 
     internal static Avatar? Read(string path)
