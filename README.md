@@ -1,12 +1,19 @@
 # VRCrypt
 
+Considering using `rust` for encryption process as C# is easy to be disassembled and replaced at runtime.
+
 ## Prerequisites
 
 - Unity Editor version: `2022.3.22f1`
 
+### Update paths
+
+- in [VRCrypt.csproj](./VRCrypt.csproj)
+- [link.sh](./scripts/link.sh)
+
 ### Link Dlls & Output Directory
 
-`sh link.sh`
+`make link`
 
 ### Link FFI
 
@@ -18,18 +25,19 @@
 
 ### Build & Replace
 
-- `b.bat`
+- `make build`
 
 > A rebuild is required after each rust build
 
 ## Release build
 
-- change lib reference in csproj
+- Update lib reference in csproj
 
 ## TODOs
 
-- encrypt gameobjects
-- Process fbx & meshes in rust
+- Encrypt/Verify at build stage
+- Encrypt GameObjects
+- Process fbx & meshes in rust?
   - https://github.com/I3ck/rust-3d
   - https://github.com/lo48576/fbxcel
   - https://github.com/lo48576/fbxcel-dom
